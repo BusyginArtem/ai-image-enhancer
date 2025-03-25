@@ -6,6 +6,7 @@ import Canvas from "./canvas";
 import FileUploader from "./uploader";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { Slider } from "../ui/slider";
 
 export default function CanvasEditor() {
   const [brushSize, setBrushSize] = useState(10);
@@ -116,18 +117,22 @@ export default function CanvasEditor() {
         </div>
       )}
 
-      <div className="bg-background fixed bottom-6 flex animate-[slideUp_0.2s_ease-out] items-center justify-center gap-8 rounded-[3rem] border-1 p-[0.8rem_2rem]">
-        {/* <button className='px-4 py-2 bg-red-500 text-white rounded' onClick={clearCanvas}>
-          Clear
-        </button> */}
-        <Button onClick={exportMask}>Process Image</Button>
+      <div className="bg-background fixed bottom-6 flex animate-[slideUp_0.2s_ease-out] items-center justify-center gap-8 rounded-[3rem] border-1 border-foreground/25 p-[0.8rem_2rem]">
+        <div className="flex gap-4">
+          <Button onClick={exportMask}>Process Image</Button>
+          <Button variant="destructive" onClick={() => {}}>
+            Clear
+          </Button>
+        </div>
 
-        <Input
-          type="range"
-          min="5"
-          max="50"
-          value={brushSize}
-          onChange={(e) => setBrushSize(Number(e.target.value))}
+        <Slider
+          className="w-50"
+          defaultValue={[brushSize]}
+          max={50}
+          min={1}
+          step={1}
+          onValueChange={(value) => setBrushSize(Number(value))}
+          disabled={!uploadedImage}
         />
       </div>
 
