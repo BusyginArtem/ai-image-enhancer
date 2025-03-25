@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { Roboto } from "next/font/google";
 
 import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const roboto = Roboto({
   weight: ["500", "700", "900"],
@@ -22,8 +23,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang='en'>
-      <body className={cn("min-h-screen bg-background antialiased overscroll-none scrollbar-overlay", roboto.variable)}>
-        {children}
+      <body className={cn("min-h-screen bg-background overscroll-none scrollbar-overlay", roboto.variable)}>
+        <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,5 +1,3 @@
-# version: "3.8"
-
 services:
   client:
     build:
@@ -15,8 +13,28 @@ services:
   server:
     build:
       context: ./server
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.server
     ports:
       - "8000:8000"
+    depends_on:
+      - lama-cleaner
     volumes:
       - ./server/uploads:/app/uploads
+    environment:
+      - LAMA_CLEANER_URL=http://lama-cleaner:8080/inpaint 
+
+  lama-cleaner:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.lama
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./lama-cleaner/models:/root/.cache
+
+  # lama-cleaner:
+  #   image: cwq1913/lama-cleaner:cpu-1.2.5
+  #   ports:
+  #     - "8080:8080"
+  #   command: ["python3", "-m", "lama_cleaner.server", "--device", "cpu", "--host", "0.0.0.0", "--port", "8080", "--model", "lama"] 
+  

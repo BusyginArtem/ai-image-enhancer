@@ -12,7 +12,14 @@ RUN npm run build
 FROM node:18-alpine AS runner
 WORKDIR /app
 
-COPY --from=builder /app ./
+# REWRITE START
+# COPY --from=builder /app ./
+COPY --from=builder /app/next.config.ts ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/package.json ./
+RUN npm install --production
+# REWRITE END
 EXPOSE 3000
 
 CMD ["npm", "run", "start"]

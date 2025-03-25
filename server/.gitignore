@@ -1,0 +1,26 @@
+# Python bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python packaging/build tools
+*.egg-info/
+.tox/
+dist/
+build/
+uploads/
+outputs/
+
+# Logs and temp files
+*.log
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Misc Python-related
+.Python

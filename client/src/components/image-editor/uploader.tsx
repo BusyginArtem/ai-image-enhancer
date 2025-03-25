@@ -11,22 +11,30 @@ export default function FileUploader({ onFileUpload }: FileUploaderProps) {
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    
+
+    if (!selectedFile) return;
+
     if (selectedFile) {
       setFile(selectedFile);
       onFileUpload(selectedFile);
     }
   };
 
+  if (file) {
+    return null;
+  }
+
   return (
-    <div className='p-4 border-dashed border-2 border-gray-300 rounded-lg'>
+    <div className="border-foreground/30 relative flex h-32 w-128 items-center justify-center rounded-lg border-2 border-dotted hover:bg-amber-300/75">
       <input
-        type='file'
-        accept='image/*,video/*'
+        id="picture"
+        type="file"
+        accept="image/*"
         onChange={handleFileChange}
-        className='w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'
+        className="absolute h-full w-full cursor-pointer opacity-0"
       />
-      {file && <p className='mt-2 text-gray-600'>Selected: {file.name}</p>}
+
+      <p>Tap here to load your picture</p>
     </div>
   );
 }

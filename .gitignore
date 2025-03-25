@@ -1,0 +1,11 @@
+# Root .gitignore
+
+# Global OS files
+.DS_Store
+
+# Global logs (if not overridden by nested .gitignore files)
+*.log
+
+# Specific root-level ignores
+lama-cleaner
+lama-cleaner-cache
