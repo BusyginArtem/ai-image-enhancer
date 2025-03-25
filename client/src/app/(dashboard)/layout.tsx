@@ -11,7 +11,7 @@ export default function DashboardLayout({
     <>
       <Header />
 
-      <main>{children}</main>
+      {children}
     </>
   );
 }

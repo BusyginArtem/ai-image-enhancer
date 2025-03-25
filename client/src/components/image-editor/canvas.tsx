@@ -19,7 +19,7 @@ export default function ({ dimensions, brushSize }: Props) {
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const animationFrameId = useRef<number | null>(null);
-
+  console.log("%c dimensions", "color: green; font-weight: bold;", dimensions);
   useEffect(() => {
     const canvas = canvasRef.current;
     const drawingCanvas = drawingCanvasRef.current;
@@ -32,18 +32,15 @@ export default function ({ dimensions, brushSize }: Props) {
     if (ctx && drawingCtx) {
       ctxRef.current = drawingCtx;
 
-      // Drawing context setup
       drawingCtx.lineCap = "round";
       drawingCtx.lineJoin = "round";
       drawingCtx.strokeStyle = "rgba(255, 239, 0, 0.3)";
       drawingCtx.lineWidth = brushSize;
 
-      // Cursor context setup
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
     }
 
-    // Cleanup animation frame on unmount
     return () => {
       if (animationFrameId.current !== null) {
         cancelAnimationFrame(animationFrameId.current);
@@ -51,7 +48,6 @@ export default function ({ dimensions, brushSize }: Props) {
     };
   }, [brushSize]);
 
-  // Cursor animation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -72,13 +68,11 @@ export default function ({ dimensions, brushSize }: Props) {
       ctx.fillStyle = "rgba(255, 239, 0, 0.3)";
       ctx.fill();
 
-      // animationFrameId.current = requestAnimationFrame(drawCursor);
+      animationFrameId.current = requestAnimationFrame(drawCursor);
     };
 
-    // Start animation
     animationFrameId.current = requestAnimationFrame(drawCursor);
 
-    // Cleanup
     return () => {
       if (animationFrameId.current !== null) {
         cancelAnimationFrame(animationFrameId.current);
@@ -129,13 +123,13 @@ export default function ({ dimensions, brushSize }: Props) {
     <>
       <canvas
         ref={drawingCanvasRef}
-        className="absolute top-0 left-0"
+        className="absolute inset-0"
         width={dimensions.width}
         height={dimensions.height}
       />
       <canvas
         ref={canvasRef}
-        className="absolute top-0 left-0 cursor-none"
+        className="absolute inset-0 cursor-none"
         width={dimensions.width}
         height={dimensions.height}
         onMouseDown={startDrawing}

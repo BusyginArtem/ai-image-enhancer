@@ -25,7 +25,7 @@ export default function FileUploader({ onFileUpload }: FileUploaderProps) {
   }
 
   return (
-    <div className="border-foreground/30 relative flex h-32 w-128 items-center justify-center rounded-lg border-2 border-dotted hover:bg-amber-300/75">
+    <div className="border-foreground/30 relative my-40 flex h-32 w-128 items-center justify-center rounded-lg border-2 border-dotted hover:bg-amber-300/75">
       <input
         id="picture"
         type="file"
