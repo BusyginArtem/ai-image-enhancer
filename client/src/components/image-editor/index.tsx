@@ -68,10 +68,11 @@ export default function CanvasEditor() {
     }
   };
 
-  const exportMask = async (canvasRef: any) => {
-    if (!canvasRef.current) return;
-
-    canvasRef.current.toBlob(async (blob: Blob) => {
+  // TODO update
+  const processImage = async (mask: any) => {
+    if (!mask) return;
+console.log('%c mask', 'color: green; font-weight: bold;', mask)
+    mask.toBlob(async (blob: Blob) => {
       if (!blob) return;
 
       try {
@@ -128,12 +129,12 @@ export default function CanvasEditor() {
       {uploadedImage && dimensions.height && dimensions.width && (
         <div
           style={{
-            transform: `scale(${zoomLevel})`,
-            transformOrigin: "center",
+            scale: zoomLevel,
+            transformOrigin: "top center",
             width: `${dimensions.width}px`,
             height: `${dimensions.height}px`,
           }}
-          className="relative flex justify-center select-none"
+          className="relative mt-10 flex justify-center select-none"
           onWheel={handleWheel}
         >
           <img
@@ -142,17 +143,22 @@ export default function CanvasEditor() {
             className="pointer-events-none absolute inset-0"
           />
 
-          <Canvas dimensions={dimensions} brushSize={brushSize} />
+          <Canvas
+            dimensions={dimensions}
+            brushSize={brushSize}
+            zoomLevel={zoomLevel}
+            handleProcessImage={processImage}
+          />
         </div>
       )}
 
       <div className="bg-background border-foreground/25 fixed bottom-6 flex animate-[slideUp_0.2s_ease-out] items-center justify-center gap-12 rounded-[3rem] border-1 p-[0.8rem_2rem]">
-        <div className="flex gap-4">
+        {/* <div className="flex gap-4">
           <Button onClick={exportMask}>Process Image</Button>
           <Button variant="destructive" onClick={() => {}}>
             Clear
           </Button>
-        </div>
+        </div> */}
 
         <p className="flex flex-row items-center justify-center gap-4">
           <label htmlFor="brush-size" className="text-lg">

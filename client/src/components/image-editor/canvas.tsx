@@ -6,9 +6,11 @@ type Props = {
     height: number;
   };
   brushSize: number;
+  zoomLevel: number;
+  handleProcessImage: (mask: HTMLCanvasElement) => void;
 };
 
-export default function ({ dimensions, brushSize }: Props) {
+export default function ({ dimensions, brushSize, zoomLevel, handleProcessImage }: Props) {
   const [isDrawing, setIsDrawing] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{
     x: number;
@@ -17,28 +19,40 @@ export default function ({ dimensions, brushSize }: Props) {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
-  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const drawingCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const animationFrameId = useRef<number | null>(null);
-  console.log("%c dimensions", "color: green; font-weight: bold;", dimensions);
+
+  // const brushSizeRef = useRef<number>(brushSize);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const drawingCanvas = drawingCanvasRef.current;
-
     if (!canvas || !drawingCanvas) return;
 
-    const ctx = canvas.getContext("2d");
-    const drawingCtx = drawingCanvas.getContext("2d");
+    const scaledWidth = dimensions.width * zoomLevel;
+    const scaledHeight = dimensions.height * zoomLevel;
+    canvas.width = scaledWidth;
+    canvas.height = scaledHeight;
+    drawingCanvas.width = scaledWidth;
+    drawingCanvas.height = scaledHeight;
 
-    if (ctx && drawingCtx) {
-      ctxRef.current = drawingCtx;
+    if (!canvasCtxRef.current) {
+      canvasCtxRef.current = canvas.getContext("2d");
+    }
 
-      drawingCtx.lineCap = "round";
-      drawingCtx.lineJoin = "round";
-      drawingCtx.strokeStyle = "rgba(255, 239, 0, 0.3)";
-      drawingCtx.lineWidth = brushSize;
+    if (!drawingCtxRef.current) {
+      drawingCtxRef.current = drawingCanvas.getContext("2d");
+    }
 
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
+    if (canvasCtxRef.current && drawingCtxRef.current) {
+      drawingCtxRef.current.lineCap = "round";
+      drawingCtxRef.current.lineJoin = "round";
+      drawingCtxRef.current.strokeStyle = "rgba(255, 239, 0, 0.3)";
+      drawingCtxRef.current.lineWidth = brushSize * zoomLevel;
+
+      canvasCtxRef.current.lineCap = "round";
+      canvasCtxRef.current.lineJoin = "round";
     }
 
     return () => {
@@ -46,27 +60,28 @@ export default function ({ dimensions, brushSize }: Props) {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [brushSize]);
+  }, [brushSize, zoomLevel, dimensions.height, dimensions.width]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    // const ctx = canvas.getContext("2d");
+    if (!canvasCtxRef.current) return;
 
     const drawCursor = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
-      ctx.arc(
+      if (!canvasCtxRef.current) return;
+      canvasCtxRef.current.clearRect(0, 0, canvas.width, canvas.height);
+      canvasCtxRef.current.beginPath();
+      canvasCtxRef.current.arc(
         cursorPosition.x,
         cursorPosition.y,
-        brushSize / 2,
+        (brushSize * zoomLevel) / 2,
         0,
         Math.PI * 2,
       );
-      ctx.fillStyle = "rgba(255, 239, 0, 0.3)";
-      ctx.fill();
+      canvasCtxRef.current.fillStyle = "rgba(255, 239, 0, 0.3)";
+      canvasCtxRef.current.fill();
 
       animationFrameId.current = requestAnimationFrame(drawCursor);
     };
@@ -78,60 +93,81 @@ export default function ({ dimensions, brushSize }: Props) {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [cursorPosition, brushSize]);
+  }, [cursorPosition, brushSize, zoomLevel]);
 
   const startDrawing = (e: React.MouseEvent) => {
-    if (!ctxRef.current) return;
-    ctxRef.current.beginPath();
-    ctxRef.current.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    if (!drawingCtxRef.current) return;
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = (e.clientX - rect.left) * (dimensions.width / rect.width);
+    const y = (e.clientY - rect.top) * (dimensions.height / rect.height);
+
+    drawingCtxRef.current.beginPath();
+    drawingCtxRef.current.moveTo(x * zoomLevel, y * zoomLevel);
     setIsDrawing(true);
   };
 
   const draw = (e: React.MouseEvent) => {
     const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
 
-    if (rect) {
-      setCursorPosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
-    }
+    const x = (e.clientX - rect.left) * (dimensions.width / rect.width);
+    const y = (e.clientY - rect.top) * (dimensions.height / rect.height);
 
-    if (!isDrawing || !ctxRef.current) return;
+    setCursorPosition({ x: x * zoomLevel, y: y * zoomLevel });
 
-    ctxRef.current.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-    ctxRef.current.stroke();
+    if (!isDrawing || !drawingCtxRef.current) return;
+
+    drawingCtxRef.current.lineTo(x * zoomLevel, y * zoomLevel);
+    drawingCtxRef.current.stroke();
   };
 
   const stopDrawing = () => {
-    if (!ctxRef.current) return;
-    ctxRef.current.closePath();
+    if (!drawingCtxRef.current) return;
+    drawingCtxRef.current.closePath();
     setIsDrawing(false);
+
+    if (!canvasRef.current) return;
+    handleProcessImage(canvasRef.current)
+
+    // TODO !!!
+    // if (!canvasCtxRef.current || !canvasRef.current) return;
+    // canvasCtxRef.current.clearRect(
+    //   0,
+    //   0,
+    //   canvasRef.current.width,
+    //   canvasRef.current.height,
+    // );
   };
 
-  const clearCanvas = () => {
-    if (!ctxRef.current || !canvasRef.current) return;
-    ctxRef.current.clearRect(
-      0,
-      0,
-      canvasRef.current.width,
-      canvasRef.current.height,
-    );
-  };
+  // const clearCanvas = () => {
+  //   if (!drawingCtxRef.current || !canvasRef.current) return;
+  //   drawingCtxRef.current.clearRect(
+  //     0,
+  //     0,
+  //     canvasRef.current.width,
+  //     canvasRef.current.height,
+  //   );
+  // };
 
   return (
     <>
       <canvas
         ref={drawingCanvasRef}
         className="absolute inset-0"
-        width={dimensions.width}
-        height={dimensions.height}
+        style={{
+          width: `${dimensions.width}px`,
+          height: `${dimensions.height}px`,
+        }}
       />
       <canvas
         ref={canvasRef}
         className="absolute inset-0 cursor-none"
-        width={dimensions.width}
-        height={dimensions.height}
+        style={{
+          width: `${dimensions.width}px`,
+          height: `${dimensions.height}px`,
+        }}
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
