@@ -20,6 +20,7 @@ services:
       - lama-cleaner
     volumes:
       - ./server/uploads:/app/uploads
+      - ./server/outputs:/app/outputs
     environment:
       - LAMA_CLEANER_URL=http://lama-cleaner:8080/inpaint 
 
@@ -31,10 +32,3 @@ services:
       - "8080:8080"
     volumes:
       - ./lama-cleaner/models:/root/.cache
-
-  # lama-cleaner:
-  #   image: cwq1913/lama-cleaner:cpu-1.2.5
-  #   ports:
-  #     - "8080:8080"
-  #   command: ["python3", "-m", "lama_cleaner.server", "--device", "cpu", "--host", "0.0.0.0", "--port", "8080", "--model", "lama"] 
-  

@@ -5,13 +5,16 @@ import { Image as ImageIcon } from "lucide-react";
 
 import Canvas from "./canvas";
 import FileUploader from "./uploader";
-import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
+import { cn } from "@/lib/utils";
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function CanvasEditor() {
   const [brushSize, setBrushSize] = useState(10);
   const [editedImage, setEditedImage] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState<boolean>(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [dimensions, setDimensions] = useState<{
@@ -50,7 +53,7 @@ export default function CanvasEditor() {
     formData.append("file", imageFile);
 
     try {
-      const response = await fetch("http://localhost:8000/upload", {
+      const response = await fetch(`${apiUrl}/upload`, {
         method: "POST",
         body: formData,
       });
@@ -68,12 +71,13 @@ export default function CanvasEditor() {
     }
   };
 
-  // TODO update
-  const processImage = async (mask: any) => {
+  const processImage = async (mask: HTMLCanvasElement) => {
     if (!mask) return;
-console.log('%c mask', 'color: green; font-weight: bold;', mask)
-    mask.toBlob(async (blob: Blob) => {
+
+    mask.toBlob(async (blob: Blob | null) => {
       if (!blob) return;
+
+      setUploadingImage(true);
 
       try {
         const formData = new FormData();
@@ -85,19 +89,23 @@ console.log('%c mask', 'color: green; font-weight: bold;', mask)
 
         formData.append("image_path", uploadedImagePath);
 
-        const response = await fetch("http://localhost:8000/process", {
+        const response = await fetch(`${apiUrl}/process`, {
           method: "POST",
           body: formData,
         });
 
         if (response.ok) {
           const data = await response.json();
-          setEditedImage(data.output_url);
+          const fullUrl = `${apiUrl}${data.output_url}`;
+          console.log('%c fullUrl', 'color: green; font-weight: bold;', fullUrl)
+          setEditedImage(fullUrl);
         } else {
           console.error("Image processing failed.");
         }
       } catch (error) {
         console.error("Processing failed:", error);
+      } finally {
+        setUploadingImage(false);
       }
     }, "image/png");
   };
@@ -134,7 +142,9 @@ console.log('%c mask', 'color: green; font-weight: bold;', mask)
             width: `${dimensions.width}px`,
             height: `${dimensions.height}px`,
           }}
-          className="relative mt-10 flex justify-center select-none"
+          className={cn("relative mt-10 flex justify-center select-none", {
+            "animate-pulsate": uploadingImage,
+          })}
           onWheel={handleWheel}
         >
           <img
@@ -148,18 +158,12 @@ console.log('%c mask', 'color: green; font-weight: bold;', mask)
             brushSize={brushSize}
             zoomLevel={zoomLevel}
             handleProcessImage={processImage}
+            disabled={uploadingImage}
           />
         </div>
       )}
 
       <div className="bg-background border-foreground/25 fixed bottom-6 flex animate-[slideUp_0.2s_ease-out] items-center justify-center gap-12 rounded-[3rem] border-1 p-[0.8rem_2rem]">
-        {/* <div className="flex gap-4">
-          <Button onClick={exportMask}>Process Image</Button>
-          <Button variant="destructive" onClick={() => {}}>
-            Clear
-          </Button>
-        </div> */}
-
         <p className="flex flex-row items-center justify-center gap-4">
           <label htmlFor="brush-size" className="text-lg">
             Brush

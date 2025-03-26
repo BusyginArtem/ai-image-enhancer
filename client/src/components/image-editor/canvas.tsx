@@ -7,11 +7,19 @@ type Props = {
   };
   brushSize: number;
   zoomLevel: number;
+  disabled: boolean;
   handleProcessImage: (mask: HTMLCanvasElement) => void;
 };
 
-export default function ({ dimensions, brushSize, zoomLevel, handleProcessImage }: Props) {
+export default function Canvas({
+  dimensions,
+  brushSize,
+  zoomLevel,
+  disabled,
+  handleProcessImage,
+}: Props) {
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isDrawn, setIsDrawn] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{
     x: number;
     y: number;
@@ -22,8 +30,6 @@ export default function ({ dimensions, brushSize, zoomLevel, handleProcessImage 
   const drawingCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const animationFrameId = useRef<number | null>(null);
-
-  // const brushSizeRef = useRef<number>(brushSize);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -48,7 +54,7 @@ export default function ({ dimensions, brushSize, zoomLevel, handleProcessImage 
     if (canvasCtxRef.current && drawingCtxRef.current) {
       drawingCtxRef.current.lineCap = "round";
       drawingCtxRef.current.lineJoin = "round";
-      drawingCtxRef.current.strokeStyle = "rgba(255, 239, 0, 0.3)";
+      drawingCtxRef.current.strokeStyle = "rgba(255,239,0,0.3)";
       drawingCtxRef.current.lineWidth = brushSize * zoomLevel;
 
       canvasCtxRef.current.lineCap = "round";
@@ -80,7 +86,7 @@ export default function ({ dimensions, brushSize, zoomLevel, handleProcessImage 
         0,
         Math.PI * 2,
       );
-      canvasCtxRef.current.fillStyle = "rgba(255, 239, 0, 0.3)";
+      canvasCtxRef.current.fillStyle = "rgba(255,239,0,0.2)";
       canvasCtxRef.current.fill();
 
       animationFrameId.current = requestAnimationFrame(drawCursor);
@@ -96,7 +102,7 @@ export default function ({ dimensions, brushSize, zoomLevel, handleProcessImage 
   }, [cursorPosition, brushSize, zoomLevel]);
 
   const startDrawing = (e: React.MouseEvent) => {
-    if (!drawingCtxRef.current) return;
+    if (!drawingCtxRef.current || disabled) return;
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
@@ -121,41 +127,26 @@ export default function ({ dimensions, brushSize, zoomLevel, handleProcessImage 
 
     drawingCtxRef.current.lineTo(x * zoomLevel, y * zoomLevel);
     drawingCtxRef.current.stroke();
+    setIsDrawn(true);
   };
 
   const stopDrawing = () => {
     if (!drawingCtxRef.current) return;
     drawingCtxRef.current.closePath();
     setIsDrawing(false);
-
-    if (!canvasRef.current) return;
-    handleProcessImage(canvasRef.current)
-
-    // TODO !!!
-    // if (!canvasCtxRef.current || !canvasRef.current) return;
-    // canvasCtxRef.current.clearRect(
-    //   0,
-    //   0,
-    //   canvasRef.current.width,
-    //   canvasRef.current.height,
-    // );
   };
 
-  // const clearCanvas = () => {
-  //   if (!drawingCtxRef.current || !canvasRef.current) return;
-  //   drawingCtxRef.current.clearRect(
-  //     0,
-  //     0,
-  //     canvasRef.current.width,
-  //     canvasRef.current.height,
-  //   );
-  // };
+  const sendDrawing = () => {
+    if (!drawingCanvasRef.current || disabled || !isDrawn) return;
+    handleProcessImage(drawingCanvasRef.current);
+    setIsDrawn(false);
+  };
 
   return (
     <>
       <canvas
         ref={drawingCanvasRef}
-        className="absolute inset-0"
+        className="absolute inset-0 opacity-75"
         style={{
           width: `${dimensions.width}px`,
           height: `${dimensions.height}px`,
@@ -171,7 +162,7 @@ export default function ({ dimensions, brushSize, zoomLevel, handleProcessImage 
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
-        onMouseLeave={stopDrawing}
+        onMouseLeave={sendDrawing}
       />
     </>
   );

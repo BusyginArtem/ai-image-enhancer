@@ -1,5 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+# from starlette.responses import FileResponse
 
 import shutil
 import os
@@ -17,15 +19,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_FOLDER = "uploads"
-OUTPUT_FOLDER = "outputs"
+BASE_DIR = "/app"
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+OUTPUT_FOLDER = os.path.join(BASE_DIR, "outputs")
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
+# class CORPStaticFiles(StaticFiles):
+#     async def get_response(self, path: str, scope):
+#         response = await super().get_response(path, scope)
+#         response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+#         return response
+
+print(f"OUTPUT_FOLDER resolved to: {os.path.abspath(OUTPUT_FOLDER)}")
+app.mount("/outputs", StaticFiles(directory=OUTPUT_FOLDER), name="outputs")
+        
 @app.post("/upload")
 async def upload_image(file: UploadFile = File(...)):
     """Uploading the image to the server."""
-    try:
+    try:        
         file_path = os.path.join(UPLOAD_FOLDER, os.path.basename(file.filename))
 
         with open(file_path, "wb") as buffer:
@@ -38,7 +51,7 @@ async def upload_image(file: UploadFile = File(...)):
 async def process_image(
     image_path: str = Form(...),
     mask: UploadFile = File(...),
-     ldmSteps: int = Form(25),
+    ldmSteps: int = Form(25),
     ldmSampler: str = Form("plms"),
     zitsWireframe: bool = Form(True),
     hdStrategy: str = Form("Crop"),
@@ -130,14 +143,26 @@ async def process_image(
         os.remove(mask_path)
 
         if response.status_code == 200:
-            output_path = os.path.join(OUTPUT_FOLDER, f"processed_{os.path.basename(image_path)}")
-            
-            os.remove(image_path)
-            print(response)
+            output_filename = f"processed_{os.path.basename(image_path)}"
+            output_path = os.path.join(OUTPUT_FOLDER, output_filename)
             
             with open(output_path, "wb") as f:
                 f.write(response.content)
-            return {"message": "Processing complete", "output": output_path}
+                
+            if os.path.exists(output_path):
+                print(f"File written successfully: {output_path}")
+            else:
+                print(f"File not written: {output_path}")
+                
+            os.remove(image_path)
+            output_url = f"/outputs/{output_filename}"
+            
+            if os.path.exists(output_path):
+                print(f"File confirmed at: {output_path}")
+            else:
+                print(f"File missing at: {output_path}")
+            
+            return {"message": "Processing complete", "output_url": output_url}
         else:
             os.remove(image_path)
             raise HTTPException(status_code=500, detail=f"Processing failed: {response.text}")
