@@ -36,15 +36,6 @@ export default function Canvas({
     const drawingCanvas = drawingCanvasRef.current;
     if (!canvas || !drawingCanvas) return;
 
-    // const scaledWidth = dimensions.width * zoomLevel;
-    // const scaledHeight = dimensions.height * zoomLevel;
-    // const scaledWidth = dimensions.width;
-    // const scaledHeight = dimensions.height;
-    // canvas.width = scaledWidth;
-    // canvas.height = scaledHeight;
-    // drawingCanvas.width = scaledWidth;
-    // drawingCanvas.height = scaledHeight;
-
     canvasCtxRef.current = canvas.getContext("2d");
     drawingCtxRef.current = drawingCanvas.getContext("2d");
 
@@ -70,7 +61,6 @@ export default function Canvas({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // const ctx = canvas.getContext("2d");
     if (!canvasCtxRef.current) return;
 
     const drawCursor = () => {
@@ -168,26 +158,12 @@ export default function Canvas({
       <canvas
         ref={drawingCanvasRef}
         className="absolute inset-0 opacity-75"
-        style={
-          {
-            // width: `${dimensions.width}px`,
-            // height: `${dimensions.height}px`,
-            // scale: zoomLevel,
-          }
-        }
         width={dimensions.width}
         height={dimensions.height}
       />
       <canvas
         ref={canvasRef}
         className="absolute inset-0 cursor-none"
-        style={
-          {
-            // width: `${dimensions.width}px`,
-            // height: `${dimensions.height}px`,
-            // scale: zoomLevel,
-          }
-        }
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}

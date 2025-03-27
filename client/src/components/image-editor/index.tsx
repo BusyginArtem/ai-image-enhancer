@@ -12,17 +12,33 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 const DEFAULT_IMAGE_WIDTH = 600;
 
 export default function CanvasEditor() {
-  const [brushSize, setBrushSize] = useState(10);
   const [editedImage, setEditedImage] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [originalImageFile, setOriginalImageFile] = useState<File | null>(null);
+
+  const [brushSize, setBrushSize] = useState(10);
   const [uploadingImage, setUploadingImage] = useState<boolean>(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [dimensions, setDimensions] = useState<{
     width: number;
     height: number;
   }>({ width: 0, height: 0 });
 
+  // console.log(
+  //   "%c uploadedImage",
+  //   "color: green; font-weight: bold;",
+  //   uploadedImage,
+  // );
+  // console.log(
+  //   "%c originalImageFile",
+  //   "color: green; font-weight: bold;",
+  //   originalImageFile,
+  // );
+  // console.log(
+  //   "%c editedImage",
+  //   "color: green; font-weight: bold;",
+  //   editedImage,
+  // );
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleWheel = (e: WheelEvent) => {
@@ -50,7 +66,7 @@ export default function CanvasEditor() {
   }, [uploadedImage, dimensions.height, dimensions.width]);
 
   const handleFileUpload = (file: File) => {
-    setImageFile(file);
+    setOriginalImageFile(file);
 
     const reader = new FileReader();
 
@@ -76,12 +92,13 @@ export default function CanvasEditor() {
     reader.readAsDataURL(file);
   };
 
-  const uploadImage = async () => {
-    if (!imageFile) return null;
+  const uploadImage = async (fileToUpload: File) => {
+    if (!originalImageFile) return null;
 
     const formData = new FormData();
 
-    formData.append("file", imageFile);
+    // formData.append("file", originalImageFile);
+    formData.append("file", fileToUpload);
 
     try {
       const response = await fetch(`${apiUrl}/upload`, {
@@ -110,13 +127,34 @@ export default function CanvasEditor() {
         if (!blob) return;
 
         setUploadingImage(true);
-        setEditedImage(null);
+        // setEditedImage(null);
 
         try {
           const formData = new FormData();
           formData.append("mask", blob, "mask.png");
 
-          const uploadedImagePath = await uploadImage();
+          // const uploadedImagePath = await uploadImage();
+
+          // Determine which image to upload: editedImage or imageFile
+          let uploadedImagePath: string | null;
+
+          if (editedImage && originalImageFile) {
+            const response = await fetch(editedImage);
+            const imageBlob = await response.blob();
+            const imageFileFromBlob = new File(
+              [imageBlob],
+              originalImageFile?.name,
+              {
+                type: "image/png",
+                lastModified: Date.now(),
+              },
+            );
+            uploadedImagePath = await uploadImage(imageFileFromBlob);
+          } else if (originalImageFile) {
+            uploadedImagePath = await uploadImage(originalImageFile);
+          } else {
+            throw new Error("No image available to process");
+          }
 
           if (!uploadedImagePath) return;
 
@@ -128,10 +166,13 @@ export default function CanvasEditor() {
           });
 
           if (response.ok) {
-            const data = await response.json();
-            const fullUrl = `${apiUrl}${data.output_url}`;
+            // const data = await response.json();
+            // const fullUrl = `${apiUrl}${data.output_url}`;
 
-            setEditedImage(fullUrl);
+            // setEditedImage(fullUrl);
+            const imageBlob = await response.blob();
+            const imageUrl = URL.createObjectURL(imageBlob);
+            setEditedImage(imageUrl);
 
             return resolve();
           } else {
@@ -161,7 +202,7 @@ export default function CanvasEditor() {
 
       <FileUploader onFileUpload={handleFileUpload} />
 
-      {uploadedImage && dimensions.height && dimensions.width && (
+      {!!dimensions.height && !!dimensions.width && (
         <div
           ref={containerRef}
           style={{
@@ -174,13 +215,23 @@ export default function CanvasEditor() {
             "animate-pulsate": uploadingImage,
           })}
         >
-          <img
-            src={uploadedImage}
-            alt="Uploaded"
-            className="pointer-events-none absolute inset-0"
-            width={`${dimensions.width}px`}
-            height={`${dimensions.height}px`}
-          />
+          {uploadedImage && !editedImage ? (
+            <img
+              src={uploadedImage}
+              alt="Uploaded"
+              className="pointer-events-none absolute inset-0"
+              width={`${dimensions.width}px`}
+              height={`${dimensions.height}px`}
+            />
+          ) : editedImage ? (
+            <img
+              src={editedImage}
+              alt="Uploaded"
+              className="pointer-events-none absolute inset-0"
+              width={`${dimensions.width}px`}
+              height={`${dimensions.height}px`}
+            />
+          ) : null}
 
           <Canvas
             dimensions={dimensions}
@@ -210,12 +261,12 @@ export default function CanvasEditor() {
         </p>
       </div>
 
-      {editedImage && (
+      {/* {editedImage && (
         <div className="z-20 mt-4">
           <h2>Edited Image:</h2>
           <img src={editedImage} alt="Edited result" />
         </div>
-      )}
+      )} */}
     </section>
   );
 }
