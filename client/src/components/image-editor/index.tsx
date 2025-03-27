@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Image as ImageIcon } from "lucide-react";
 
 import Canvas from "./canvas";
@@ -9,6 +9,7 @@ import { Slider } from "../ui/slider";
 import { cn } from "@/lib/utils";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const DEFAULT_IMAGE_WIDTH = 600;
 
 export default function CanvasEditor() {
   const [brushSize, setBrushSize] = useState(10);
@@ -21,6 +22,32 @@ export default function CanvasEditor() {
     width: number;
     height: number;
   }>({ width: 0, height: 0 });
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleWheel = (e: WheelEvent) => {
+    e.preventDefault();
+
+    const zoomStep = 0.1;
+    const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
+
+    setZoomLevel((prev) => {
+      const newZoom = Math.max(0.25, Math.min(2, prev + delta));
+      return newZoom;
+    });
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (container) {
+      container.addEventListener("wheel", handleWheel, { passive: false });
+
+      return () => {
+        container.removeEventListener("wheel", handleWheel);
+      };
+    }
+  }, [uploadedImage, dimensions.height, dimensions.width]);
 
   const handleFileUpload = (file: File) => {
     setImageFile(file);
@@ -35,6 +62,9 @@ export default function CanvasEditor() {
       const img = new Image();
 
       img.onload = () => {
+        const imageRatio = DEFAULT_IMAGE_WIDTH / img.naturalWidth;
+        setZoomLevel(imageRatio < 1 ? imageRatio : 1);
+
         setDimensions({
           width: img.naturalWidth,
           height: img.naturalHeight,
@@ -50,6 +80,7 @@ export default function CanvasEditor() {
     if (!imageFile) return null;
 
     const formData = new FormData();
+
     formData.append("file", imageFile);
 
     try {
@@ -71,54 +102,50 @@ export default function CanvasEditor() {
     }
   };
 
-  const processImage = async (mask: HTMLCanvasElement) => {
+  const processImage = async (mask: HTMLCanvasElement): Promise<void> => {
     if (!mask) return;
 
-    mask.toBlob(async (blob: Blob | null) => {
-      if (!blob) return;
+    return new Promise((resolve, reject) => {
+      mask.toBlob(async (blob: Blob | null) => {
+        if (!blob) return;
 
-      setUploadingImage(true);
+        setUploadingImage(true);
+        setEditedImage(null);
 
-      try {
-        const formData = new FormData();
-        formData.append("mask", blob, "mask.png");
+        try {
+          const formData = new FormData();
+          formData.append("mask", blob, "mask.png");
 
-        const uploadedImagePath = await uploadImage();
+          const uploadedImagePath = await uploadImage();
 
-        if (!uploadedImagePath) return;
+          if (!uploadedImagePath) return;
 
-        formData.append("image_path", uploadedImagePath);
+          formData.append("image_path", uploadedImagePath);
 
-        const response = await fetch(`${apiUrl}/process`, {
-          method: "POST",
-          body: formData,
-        });
+          const response = await fetch(`${apiUrl}/process`, {
+            method: "POST",
+            body: formData,
+          });
 
-        if (response.ok) {
-          const data = await response.json();
-          const fullUrl = `${apiUrl}${data.output_url}`;
-          console.log('%c fullUrl', 'color: green; font-weight: bold;', fullUrl)
-          setEditedImage(fullUrl);
-        } else {
-          console.error("Image processing failed.");
+          if (response.ok) {
+            const data = await response.json();
+            const fullUrl = `${apiUrl}${data.output_url}`;
+
+            setEditedImage(fullUrl);
+
+            return resolve();
+          } else {
+            console.error("Image processing failed.");
+
+            return reject();
+          }
+        } catch (error) {
+          console.error("Processing failed:", error);
+          return reject();
+        } finally {
+          setUploadingImage(false);
         }
-      } catch (error) {
-        console.error("Processing failed:", error);
-      } finally {
-        setUploadingImage(false);
-      }
-    }, "image/png");
-  };
-
-  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    e.preventDefault();
-
-    const zoomStep = 0.1;
-    const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
-
-    setZoomLevel((prev) => {
-      const newZoom = Math.max(0.25, Math.min(2, prev + delta));
-      return newZoom;
+      }, "image/png");
     });
   };
 
@@ -136,6 +163,7 @@ export default function CanvasEditor() {
 
       {uploadedImage && dimensions.height && dimensions.width && (
         <div
+          ref={containerRef}
           style={{
             scale: zoomLevel,
             transformOrigin: "top center",
@@ -145,12 +173,13 @@ export default function CanvasEditor() {
           className={cn("relative mt-10 flex justify-center select-none", {
             "animate-pulsate": uploadingImage,
           })}
-          onWheel={handleWheel}
         >
           <img
             src={uploadedImage}
             alt="Uploaded"
             className="pointer-events-none absolute inset-0"
+            width={`${dimensions.width}px`}
+            height={`${dimensions.height}px`}
           />
 
           <Canvas
@@ -182,7 +211,7 @@ export default function CanvasEditor() {
       </div>
 
       {editedImage && (
-        <div className="mt-4">
+        <div className="z-20 mt-4">
           <h2>Edited Image:</h2>
           <img src={editedImage} alt="Edited result" />
         </div>

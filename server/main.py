@@ -1,7 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-# from starlette.responses import FileResponse
 
 import shutil
 import os
@@ -13,7 +12,7 @@ LAMA_CLEANER_URL = os.getenv("LAMA_CLEANER_URL", "http://lama-cleaner:8080/inpai
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development. Restrict this in production.
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,12 +24,6 @@ OUTPUT_FOLDER = os.path.join(BASE_DIR, "outputs")
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-
-# class CORPStaticFiles(StaticFiles):
-#     async def get_response(self, path: str, scope):
-#         response = await super().get_response(path, scope)
-#         response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
-#         return response
 
 print(f"OUTPUT_FOLDER resolved to: {os.path.abspath(OUTPUT_FOLDER)}")
 app.mount("/outputs", StaticFiles(directory=OUTPUT_FOLDER), name="outputs")
