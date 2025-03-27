@@ -1,6 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-# from fastapi.staticfiles import StaticFiles
 from fastapi.responses import Response
 from io import BytesIO
 
@@ -22,14 +21,10 @@ app.add_middleware(
 
 BASE_DIR = "/app"
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
-# OUTPUT_FOLDER = os.path.join(BASE_DIR, "outputs")
+
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-# os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
-# print(f"OUTPUT_FOLDER resolved to: {os.path.abspath(OUTPUT_FOLDER)}")
-# app.mount("/outputs", StaticFiles(directory=OUTPUT_FOLDER), name="outputs")
-        
 @app.post("/upload")
 async def upload_image(file: UploadFile = File(...)):
     """Uploading the image to the server."""
@@ -86,18 +81,13 @@ async def process_image(
         # Ensure the image file exists
         if not os.path.exists(image_path):
             raise HTTPException(status_code=404, detail="Image file not found.")
-
-        # mask_path = os.path.join(UPLOAD_FOLDER, os.path.basename(mask.filename))
-        # with open(mask_path, "wb") as buffer:
-        #     shutil.copyfileobj(mask.file, buffer)
         
         # Read mask into memory instead of saving to disk
-        mask_data = await mask.read()  # Get mask bytes
-        mask_buffer = BytesIO(mask_data)  # Wrap in BytesIO
+        mask_data = await mask.read()
+        mask_buffer = BytesIO(mask_data)
 
         files = {
             "image": (os.path.basename(image_path), open(image_path, "rb"), "image/png"),
-            # "mask": (mask.filename, open(mask_path, "rb"), "image/png"),
             "mask": (mask.filename, mask_buffer, "image/png"),
         }
         
@@ -140,45 +130,14 @@ async def process_image(
         
         response = requests.post(LAMA_CLEANER_URL, files=files, data=data)
         
-        # Clean up
-        mask_buffer.close()  # Close the BytesIO buffer
+        mask_buffer.close()
         os.remove(image_path)
         
         if response.status_code == 200:
-            # os.remove(image_path)
             return Response(content=response.content, media_type="image/png")
         else:
-            # os.remove(image_path)
             raise HTTPException(status_code=500, detail=f"Processing failed: {response.text}")
-
-        # if response.status_code == 200:
-            # output_filename = f"processed_{os.path.basename(image_path)}"
-            # output_path = os.path.join(OUTPUT_FOLDER, output_filename)
-            
-            # with open(output_path, "wb") as f:
-            #     f.write(response.content)
-                
-            # if os.path.exists(output_path):
-            #     print(f"File written successfully: {output_path}")
-            # else:
-            #     print(f"File not written: {output_path}")
-                
-            # os.remove(image_path)
-            # output_url = f"/outputs/{output_filename}"
-            
-            # if os.path.exists(output_path):
-            #     print(f"File confirmed at: {output_path}")
-            # else:
-            #     print(f"File missing at: {output_path}")
-            
-            # return {"message": "Processing complete", "output_url": output_url}
-        # else:
-        #     os.remove(image_path)
-        #     raise HTTPException(status_code=500, detail=f"Processing failed: {response.text}")
     except Exception as e:
-        # Ensure cleanup in case of errors
         if os.path.exists(image_path):
             os.remove(image_path)
-        # if 'mask_path' in locals() and os.path.exists(mask_path):
-        #     os.remove(mask_path)
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")

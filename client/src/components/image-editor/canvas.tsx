@@ -43,8 +43,8 @@ export default function Canvas({
       drawingCtxRef.current.lineCap = "round";
       drawingCtxRef.current.lineJoin = "round";
       drawingCtxRef.current.strokeStyle = "rgba(255,239,0,0.3)";
-      drawingCtxRef.current.lineWidth = brushSize * zoomLevel;
-      // drawingCtxRef.current.lineWidth = brushSize;
+      // drawingCtxRef.current.lineWidth = brushSize * zoomLevel;
+      drawingCtxRef.current.lineWidth = brushSize;
 
       canvasCtxRef.current.lineCap = "round";
       canvasCtxRef.current.lineJoin = "round";
@@ -70,8 +70,8 @@ export default function Canvas({
       canvasCtxRef.current.arc(
         cursorPosition.x,
         cursorPosition.y,
-        (brushSize * zoomLevel) / 2,
-        // brushSize / 2,
+        // (brushSize * zoomLevel) / 2,
+        brushSize / 2,
         0,
         Math.PI * 2,
       );
@@ -99,7 +99,6 @@ export default function Canvas({
     const y = (e.clientY - rect.top) * (dimensions.height / rect.height);
 
     drawingCtxRef.current.beginPath();
-    // drawingCtxRef.current.moveTo(x * zoomLevel, y * zoomLevel);
     drawingCtxRef.current.moveTo(x, y);
     setIsDrawing(true);
   };
@@ -111,12 +110,10 @@ export default function Canvas({
     const x = (e.clientX - rect.left) * (dimensions.width / rect.width);
     const y = (e.clientY - rect.top) * (dimensions.height / rect.height);
 
-    // setCursorPosition({ x: x * zoomLevel, y: y * zoomLevel });
     setCursorPosition({ x: x, y: y });
 
     if (!isDrawing || !drawingCtxRef.current) return;
 
-    // drawingCtxRef.current.lineTo(x * zoomLevel, y * zoomLevel);
     drawingCtxRef.current.lineTo(x, y);
     drawingCtxRef.current.stroke();
     setIsDrawn(true);

@@ -20,7 +20,6 @@ services:
       - lama-cleaner
     volumes:
       - ./server/uploads:/app/uploads
-      # - ./server/outputs:/app/outputs
     environment:
       - LAMA_CLEANER_URL=http://lama-cleaner:8080/inpaint 
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Image as ImageIcon } from "lucide-react";
+import { Download, Eye, Image as ImageIcon } from "lucide-react";
 
 import Canvas from "./canvas";
 import FileUploader from "./uploader";
@@ -15,30 +15,17 @@ export default function CanvasEditor() {
   const [editedImage, setEditedImage] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [originalImageFile, setOriginalImageFile] = useState<File | null>(null);
+  const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
 
   const [brushSize, setBrushSize] = useState(10);
   const [uploadingImage, setUploadingImage] = useState<boolean>(false);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [showOriginalImageFile, setShowOriginalImageFile] = useState(false);
   const [dimensions, setDimensions] = useState<{
     width: number;
     height: number;
   }>({ width: 0, height: 0 });
 
-  // console.log(
-  //   "%c uploadedImage",
-  //   "color: green; font-weight: bold;",
-  //   uploadedImage,
-  // );
-  // console.log(
-  //   "%c originalImageFile",
-  //   "color: green; font-weight: bold;",
-  //   originalImageFile,
-  // );
-  // console.log(
-  //   "%c editedImage",
-  //   "color: green; font-weight: bold;",
-  //   editedImage,
-  // );
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleWheel = (e: WheelEvent) => {
@@ -74,6 +61,7 @@ export default function CanvasEditor() {
       const dataUrl = reader.result as string;
 
       setUploadedImage(dataUrl);
+      setOriginalImageUrl(dataUrl);
 
       const img = new Image();
 
@@ -97,7 +85,6 @@ export default function CanvasEditor() {
 
     const formData = new FormData();
 
-    // formData.append("file", originalImageFile);
     formData.append("file", fileToUpload);
 
     try {
@@ -127,15 +114,11 @@ export default function CanvasEditor() {
         if (!blob) return;
 
         setUploadingImage(true);
-        // setEditedImage(null);
 
         try {
           const formData = new FormData();
           formData.append("mask", blob, "mask.png");
 
-          // const uploadedImagePath = await uploadImage();
-
-          // Determine which image to upload: editedImage or imageFile
           let uploadedImagePath: string | null;
 
           if (editedImage && originalImageFile) {
@@ -166,10 +149,6 @@ export default function CanvasEditor() {
           });
 
           if (response.ok) {
-            // const data = await response.json();
-            // const fullUrl = `${apiUrl}${data.output_url}`;
-
-            // setEditedImage(fullUrl);
             const imageBlob = await response.blob();
             const imageUrl = URL.createObjectURL(imageBlob);
             setEditedImage(imageUrl);
@@ -188,6 +167,38 @@ export default function CanvasEditor() {
         }
       }, "image/png");
     });
+  };
+
+  const downloadImage = async () => {
+    if (!editedImage) {
+      console.error("No edited image available to download");
+      return;
+    }
+
+    try {
+      const response = await fetch(editedImage);
+      const blob = await response.blob();
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = originalImageFile?.name || "edited_image.png";
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
+  };
+
+  const handleEyePress = () => {
+    setShowOriginalImageFile(true);
+  };
+
+  const handleEyeRelease = () => {
+    setShowOriginalImageFile(false);
   };
 
   return (
@@ -215,7 +226,7 @@ export default function CanvasEditor() {
             "animate-pulsate": uploadingImage,
           })}
         >
-          {uploadedImage && !editedImage ? (
+          {uploadedImage && !editedImage && (
             <img
               src={uploadedImage}
               alt="Uploaded"
@@ -223,7 +234,9 @@ export default function CanvasEditor() {
               width={`${dimensions.width}px`}
               height={`${dimensions.height}px`}
             />
-          ) : editedImage ? (
+          )}
+
+          {editedImage && (
             <img
               src={editedImage}
               alt="Uploaded"
@@ -231,7 +244,28 @@ export default function CanvasEditor() {
               width={`${dimensions.width}px`}
               height={`${dimensions.height}px`}
             />
-          ) : null}
+          )}
+
+          <div className="relative">
+            {originalImageUrl && showOriginalImageFile && (
+              <>
+                <div
+                  className={cn(
+                    // "absolute z-[2] h-full w-1.5 bg-[var(--yellow-accent)] transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]",
+                    "animate-slide absolute z-[2] h-full w-1.5 bg-[var(--yellow-accent)]",
+                    // showOriginalImageFile ? "right-0" : "left-0",
+                  )}
+                />
+                <img
+                  src={originalImageUrl}
+                  alt="Uploaded"
+                  className="pointer-events-none absolute inset-0"
+                  width={`${dimensions.width}px`}
+                  height={`${dimensions.height}px`}
+                />
+              </>
+            )}
+          </div>
 
           <Canvas
             dimensions={dimensions}
@@ -243,7 +277,7 @@ export default function CanvasEditor() {
         </div>
       )}
 
-      <div className="bg-background border-foreground/25 fixed bottom-6 flex animate-[slideUp_0.2s_ease-out] items-center justify-center gap-12 rounded-[3rem] border-1 p-[0.8rem_2rem]">
+      <div className="bg-background border-foreground/25 fixed bottom-6 flex animate-[slideUp_0.2s_ease-out] items-center justify-center gap-8 rounded-[3rem] border-1 p-[0.8rem_2rem]">
         <p className="flex flex-row items-center justify-center gap-4">
           <label htmlFor="brush-size" className="text-lg">
             Brush
@@ -259,14 +293,29 @@ export default function CanvasEditor() {
             disabled={!uploadedImage}
           />
         </p>
-      </div>
 
-      {/* {editedImage && (
-        <div className="z-20 mt-4">
-          <h2>Edited Image:</h2>
-          <img src={editedImage} alt="Edited result" />
+        <div className="flex items-center gap-4">
+          <Download
+            className={cn(
+              "cursor-pointer",
+              !editedImage && "cursor-default text-gray-500",
+            )}
+            size={24}
+            onClick={downloadImage}
+          />
+
+          <Eye
+            className={cn(
+              "cursor-pointer",
+              !originalImageFile && "cursor-default text-gray-500",
+            )}
+            size={24}
+            onMouseDown={handleEyePress}
+            onMouseUp={handleEyeRelease}
+            onMouseLeave={handleEyeRelease}
+          />
         </div>
-      )} */}
+      </div>
     </section>
   );
 }
