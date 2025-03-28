@@ -62,6 +62,7 @@ export default function CanvasEditor() {
 
       setUploadedImage(dataUrl);
       setOriginalImageUrl(dataUrl);
+      setEditedImage(null);
 
       const img = new Image();
 
@@ -204,14 +205,30 @@ export default function CanvasEditor() {
   return (
     <section className="relative flex flex-col items-center">
       <div className="absolute top-0 left-4 flex w-full items-center justify-start gap-8">
-        <ImageIcon className="cursor-pointer" size={24} />
+        <FileUploader
+          onFileUpload={handleFileUpload}
+          className="h-6 w-6"
+          loadArea={
+            <ImageIcon size={24} cursor="pointer" />
+          }
+        />
 
         {uploadedImage && (
           <p className="border-foreground/25 rounded-[3rem] border-1 p-[0.2rem_0.75rem]">{`${dimensions.width}x${dimensions.height}`}</p>
         )}
       </div>
 
-      <FileUploader onFileUpload={handleFileUpload} />
+      {!uploadedImage && (
+        <FileUploader
+          onFileUpload={handleFileUpload}
+          className="my-40 h-32 w-128"
+          loadArea={
+            <div className="border-foreground/30 flex h-full w-full items-center justify-center rounded-lg border-2 border-dotted hover:bg-amber-300/75">
+              <p>Tap here to load your picture</p>
+            </div>
+          }
+        />
+      )}
 
       {!!dimensions.height && !!dimensions.width && (
         <div
@@ -222,7 +239,7 @@ export default function CanvasEditor() {
             width: `${dimensions.width}px`,
             height: `${dimensions.height}px`,
           }}
-          className={cn("relative mt-10 flex justify-center select-none", {
+          className={cn("relative mt-12 flex justify-center select-none", {
             "animate-pulsate": uploadingImage,
           })}
         >
@@ -239,32 +256,30 @@ export default function CanvasEditor() {
           {editedImage && (
             <img
               src={editedImage}
-              alt="Uploaded"
+              alt="Edited"
               className="pointer-events-none absolute inset-0"
               width={`${dimensions.width}px`}
               height={`${dimensions.height}px`}
             />
           )}
 
-          <div className="relative">
-            {originalImageUrl && showOriginalImageFile && (
-              <>
-                <div
-                  className={cn(
-                    // "absolute z-[2] h-full w-1.5 bg-[var(--yellow-accent)] transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]",
-                    "animate-slide absolute z-[2] h-full w-1.5 bg-[var(--yellow-accent)]",
-                    // showOriginalImageFile ? "right-0" : "left-0",
-                  )}
-                />
-                <img
-                  src={originalImageUrl}
-                  alt="Uploaded"
-                  className="pointer-events-none absolute inset-0"
-                  width={`${dimensions.width}px`}
-                  height={`${dimensions.height}px`}
-                />
-              </>
-            )}
+          {originalImageUrl && showOriginalImageFile && (
+            <img
+              src={originalImageUrl}
+              alt="Original"
+              className="pointer-events-none absolute inset-0 z-[2]"
+              width={`${dimensions.width}px`}
+              height={`${dimensions.height}px`}
+            />
+          )}
+
+          <div className="relative w-full overflow-hidden">
+            <div
+              className={cn(
+                "absolute z-[3] ml-[-2%] h-full w-1.5 bg-[var(--yellow-accent)] transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]",
+                showOriginalImageFile ? "ml-[calc(100%_-_4px)]" : "ml-[-2%]",
+              )}
+            />
           </div>
 
           <Canvas
@@ -296,19 +311,17 @@ export default function CanvasEditor() {
 
         <div className="flex items-center gap-4">
           <Download
-            className={cn(
-              "cursor-pointer",
-              !editedImage && "cursor-default text-gray-500",
-            )}
+            className={cn("cursor-pointer", {
+              "cursor-default text-gray-500": !editedImage,
+            })}
             size={24}
             onClick={downloadImage}
           />
 
           <Eye
-            className={cn(
-              "cursor-pointer",
-              !originalImageFile && "cursor-default text-gray-500",
-            )}
+            className={cn("cursor-pointer", {
+              "cursor-default text-gray-500": !editedImage,
+            })}
             size={24}
             onMouseDown={handleEyePress}
             onMouseUp={handleEyeRelease}

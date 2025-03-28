@@ -59,9 +59,8 @@ export default function Canvas({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    if (!canvasCtxRef.current) return;
+    
+    if (!canvas || !canvasCtxRef.current) return;
 
     const drawCursor = () => {
       if (!canvasCtxRef.current) return;

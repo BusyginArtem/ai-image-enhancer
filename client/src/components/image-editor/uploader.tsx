@@ -1,40 +1,40 @@
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { cn } from "@/lib/utils";
+import { ChangeEvent, ReactNode } from "react";
 
 interface FileUploaderProps {
   onFileUpload: (file: File) => void;
+  loadArea: ReactNode;
+  className?: string;
 }
 
-export default function FileUploader({ onFileUpload }: FileUploaderProps) {
-  const [file, setFile] = useState<File | null>(null);
-
+export default function FileUploader({
+  onFileUpload,
+  loadArea,
+  className,
+}: FileUploaderProps) {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
 
     if (!selectedFile) return;
 
     if (selectedFile) {
-      setFile(selectedFile);
       onFileUpload(selectedFile);
     }
   };
 
-  if (file) {
-    return null;
-  }
-
   return (
-    <div className="border-foreground/30 relative my-40 flex h-32 w-128 items-center justify-center rounded-lg border-2 border-dotted hover:bg-amber-300/75">
+    <div className={cn("relative", className)}>
       <input
         id="picture"
         type="file"
         accept="image/*"
         onChange={handleFileChange}
-        className="absolute h-full w-full cursor-pointer opacity-0"
+        className="absolute inset-0 z-[1] h-full w-full cursor-pointer opacity-0"
       />
 
-      <p>Tap here to load your picture</p>
+      {loadArea}
     </div>
   );
 }

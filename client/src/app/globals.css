@@ -6,7 +6,7 @@
 
 @theme {
   --font-roboto: Roboto, system-ui, sans-serif;
-  --animate-slide: slide 2.7s ease-out forwards;
+  /* --animate-slide: slide 2.7s ease-out forwards; */
   --animate-pulsate: pulsate 1.25s ease-in-out infinite;
 
   @keyframes pulsate {
@@ -15,14 +15,14 @@
     }
   }
 
-  @keyframes slide {
+  /* @keyframes slide {
     0% {
       transform: translateX(0);
     }
     100% {
       transform: translateX(200px);
     }
-  }
+  } */
 }
 
 @layer utilities {

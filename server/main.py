@@ -49,7 +49,6 @@ async def process_image(
     hdStrategyCropTrigerSize: int = Form(800),
     hdStrategyResizeLimit: int = Form(2048),
     prompt: str = Form(""),
-    negativePrompt: str = Form(""),
     croperX: int = Form(-91),
     croperY: int = Form(-66),
     croperHeight: int = Form(512),
@@ -61,6 +60,8 @@ async def process_image(
     sdGuidanceScale: float = Form(7.5),
     sdSampler: str = Form("uni_pc"),
     sdSeed: int = Form(-1),
+    # OPTIONAL
+    negativePrompt: str = Form(""),
     sdMatchHistograms: bool = Form(False),
     sdScale: float = Form(1),
     cv2Radius: int = Form(5),
@@ -100,7 +101,6 @@ async def process_image(
             "hdStrategyCropTrigerSize": str(hdStrategyCropTrigerSize),
             "hdStrategyResizeLimit": str(hdStrategyResizeLimit),
             "prompt": prompt,
-            "negativePrompt": negativePrompt,
             "croperX": str(croperX),
             "croperY": str(croperY),
             "croperHeight": str(croperHeight),
@@ -112,6 +112,8 @@ async def process_image(
             "sdGuidanceScale": str(sdGuidanceScale),
             "sdSampler": sdSampler,
             "sdSeed": str(sdSeed),
+            # OPTIONAL
+            "negativePrompt": negativePrompt,
             "sdMatchHistograms": str(sdMatchHistograms).lower(),
             "sdScale": str(sdScale),
             "cv2Radius": str(cv2Radius),
