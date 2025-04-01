@@ -18,8 +18,8 @@ jobs:
 
       - name: Deploy to Vercel
         run: |
-            cd client
-            vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+          cd client
+          vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
 
   deploy-server:
     runs-on: ubuntu-latest
@@ -30,8 +30,8 @@ jobs:
       - name: Install Railway CLI
         run: curl -fsSL cli.new | sh
 
-      - name: Authenticate with Railway
-        run: railway login --token ${{ secrets.RAILWAY_TOKEN }}
+      - name: Set Railway Token
+        run: echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}" >> $GITHUB_ENV
 
       - name: Deploy Server to Railway
         run: |
