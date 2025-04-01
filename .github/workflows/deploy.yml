@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  pull_request:
+  # pull_request:
 
 jobs:
   deploy-client:
@@ -23,15 +23,15 @@ jobs:
 
   deploy-server:
     runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Railway CLI
-        run: curl -fsSL cli.new | sh
-
-      - name: Set Railway Token
-        run: echo "RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}" >> $GITHUB_ENV
+      # - name: Install Railway CLI
+      #   run: curl -fsSL cli.new | sh
 
       - name: Deploy Server to Railway
         run: |
