@@ -25,6 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/railwayapp/cli:latest
     env:
+      SERVER: server
+      LAMA_CLEANER: lama-cleaner
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
       - name: Checkout repository
@@ -36,9 +38,9 @@ jobs:
       - name: Deploy Server to Railway
         run: |
           cd server
-          railway up --service server -- --project ${{ secrets.RAILWAY_PROJECT_ID }} --environment ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
+          railway up --service=${{ env.server }}
 
       - name: Deploy Lama Cleaner to Railway
         run: |
           cd server
-          railway up --service lama-cleaner -- --project ${{ secrets.RAILWAY_PROJECT_ID }} --environment ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
+          railway up --service=${{ env.LAMA_CLEANER }}
