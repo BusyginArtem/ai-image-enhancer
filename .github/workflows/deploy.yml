@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  pull_request:
+  # pull_request:
 
 jobs:
   deploy-client:
@@ -17,26 +17,28 @@ jobs:
         run: npm install -g vercel
 
       - name: Deploy to Vercel
-        run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          cd client
+          vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
 
   deploy-server:
     runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Railway CLI
-        run: curl -fsSL cli.new | sh
-
-      - name: Authenticate with Railway
-        run: railway auth --token ${{ secrets.RAILWAY_TOKEN }}
+      # - name: Install Railway CLI
+      #   run: curl -fsSL cli.new | sh
 
       - name: Deploy Server to Railway
         run: |
           cd server
-          railway up --service server
+          railway up --service server -- --project ${{ secrets.RAILWAY_PROJECT_ID }} --environment ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
 
       - name: Deploy Lama Cleaner to Railway
         run: |
           cd server
-          railway up --service lama-cleaner
+          railway up --service lama-cleaner -- --project ${{ secrets.RAILWAY_PROJECT_ID }} --environment ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
