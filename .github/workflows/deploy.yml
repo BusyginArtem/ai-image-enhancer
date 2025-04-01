@@ -36,9 +36,9 @@ jobs:
       - name: Deploy Server to Railway
         run: |
           cd server
-          railway up --service server
+          railway up --service server --project ${{ secrets.RAILWAY_PROJECT_ID }} --environment ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
 
       - name: Deploy Lama Cleaner to Railway
         run: |
           cd server
-          railway up --service lama-cleaner
+          railway up --service lama-cleaner --project ${{ secrets.RAILWAY_PROJECT_ID }} --environment ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
