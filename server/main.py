@@ -26,10 +26,11 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.post("/upload")
-async def upload_image(file: UploadFile = File(...)):
+def upload_image(file: UploadFile = File(...)):
     """Uploading the image to the server."""
     try:        
-        file_path = os.path.join(UPLOAD_FOLDER, os.path.basename(file.filename))
+        filename = file.filename if file.filename else "default_filename"
+        file_path = os.path.join(UPLOAD_FOLDER, os.path.basename(filename))
 
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
