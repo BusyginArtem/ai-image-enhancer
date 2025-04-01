@@ -1,0 +1,42 @@
+name: Deploy Next.js to Vercel & Server to Railway
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  deploy-client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Deploy to Vercel
+        run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+  deploy-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: curl -fsSL cli.new | sh
+
+      - name: Authenticate with Railway
+        run: railway auth --token ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Deploy Server to Railway
+        run: |
+          cd server
+          railway up --service server
+
+      - name: Deploy Lama Cleaner to Railway
+        run: |
+          cd server
+          railway up --service lama-cleaner
