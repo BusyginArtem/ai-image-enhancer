@@ -17,7 +17,9 @@ jobs:
         run: npm install -g vercel
 
       - name: Deploy to Vercel
-        run: vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+            cd client
+            vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
 
   deploy-server:
     runs-on: ubuntu-latest
@@ -29,7 +31,7 @@ jobs:
         run: curl -fsSL cli.new | sh
 
       - name: Authenticate with Railway
-        run: railway auth --token ${{ secrets.RAILWAY_TOKEN }}
+        run: railway login --token ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Deploy Server to Railway
         run: |
