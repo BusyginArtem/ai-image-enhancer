@@ -23,40 +23,42 @@ jobs:
   #         cd client
   #         vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
 
-  deploy-server:
-    runs-on: ubuntu-latest
-    env:
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-      SERVER_SERVICE: server
-      LAMA_CLEANER_SERVICE: lama-cleaner
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  # deploy-server:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  #     SERVER_SERVICE: server
+  #     LAMA_CLEANER_SERVICE: lama-cleaner
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
+  #     - name: Install Railway CLI
+  #       run: npm install -g @railway/cli
 
-      - name: Verify Railway Authentication
-        run: railway whoami
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  #     - name: Verify Railway Authentication
+  #       run: railway whoami
+  #       env:
+  #         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Deploy Main Server to Railway
-        run: |
-          cd server
-          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.SERVER_SERVICE }}
-          railway up
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  #     - name: Deploy Main Server to Railway
+  #       run: |
+  #         cd server
+  #         railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.SERVER_SERVICE }}
+  #         railway up
+  #       env:
+  #         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Deploy Lama Cleaner to Railway
-        run: |
-          cd server/lama-cleaner
-          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.LAMA_CLEANER_SERVICE }}
-          railway up
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  #     - name: Deploy Lama Cleaner to Railway
+  #       run: |
+  #         cd server/lama-cleaner
+  #         railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.LAMA_CLEANER_SERVICE }}
+  #         railway up
+  #       env:
+  #         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
+
+  # VERSION 1
   # deploy-server:
   #   runs-on: ubuntu-latest
   #   container: 
@@ -87,3 +89,35 @@ jobs:
   #         export RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}
   #         railway link --project=${{ secrets.RAILWAY_PROJECT_ID }}
   #         railway up --service=${{ env.LAMA_CLEANER }}
+
+
+  # VERSION 2
+  deploy-server:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      SERVER_SERVICE: server
+      LAMA_CLEANER_SERVICE: lama-cleaner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify Railway Status
+        run: railway status
+
+      - name: Verify Railway Authentication
+        run: railway whoami
+
+      - name: Deploy Main Server to Railway
+        run: |
+          cd server
+          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.SERVER_SERVICE }}
+          railway up
+
+      - name: Deploy Lama Cleaner to Railway
+        run: |
+          cd server/lama-cleaner
+          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.LAMA_CLEANER_SERVICE }}
+          railway up
