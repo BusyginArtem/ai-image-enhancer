@@ -25,7 +25,10 @@ jobs:
 
   deploy-server:
     runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
+    container: 
+      image: ghcr.io/railwayapp/cli:latest
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     env:
       SERVER: server
       LAMA_CLEANER: lama-cleaner
