@@ -41,7 +41,8 @@ jobs:
       - name: Link to Railway Project
         run: |
           cd server
-          railway link --project=${{ secrets.RAILWAY_PROJECT_ID }}
+          railway link --project cf68c6dc-0710-4971-9063-e4598ab2396c
+      # railway link --project=${{ secrets.RAILWAY_PROJECT_ID }}
 
       - name: Verify Railway Authentication
         run: railway status
