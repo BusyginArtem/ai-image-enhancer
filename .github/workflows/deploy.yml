@@ -34,20 +34,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # - name: Install Railway CLI
-      #   run: curl -fsSL cli.new | sh
-
       - name: Verify Railway Authentication
         run: railway status
 
       - name: Deploy Server to Railway
         run: |
           cd server
+          export RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}
           railway link --project=${{ secrets.RAILWAY_PROJECT_ID }}
           railway up --service=${{ env.SERVER }}
 
       - name: Deploy Lama Cleaner to Railway
         run: |
           cd server
+          export RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}
           railway link --project=${{ secrets.RAILWAY_PROJECT_ID }}
           railway up --service=${{ env.LAMA_CLEANER }}
