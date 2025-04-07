@@ -40,9 +40,11 @@ jobs:
       - name: Deploy Server to Railway
         run: |
           cd server
-          railway up --service=${{ env.SERVER }}
+          railway link -p cf68c6dc-0710-4971-9063-e4598ab2396c
+          railway up --service=${{ env.SERVER }} --token=${{ env.RAILWAY_TOKEN }}
 
       - name: Deploy Lama Cleaner to Railway
         run: |
           cd server
-          railway up --service=${{ env.LAMA_CLEANER }}
+          railway link -p cf68c6dc-0710-4971-9063-e4598ab2396c
+          railway up --service=${{ env.LAMA_CLEANER }} --token=${{ env.RAILWAY_TOKEN }}
