@@ -96,6 +96,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/railwayapp/cli:latest
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       SERVER_SERVICE: server
