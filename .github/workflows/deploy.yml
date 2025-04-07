@@ -40,12 +40,12 @@ jobs:
       - name: Verify Railway Authentication
         run: railway status
 
-      - name: Deploy Server to Railway
-        run: |
-          cd server
-          export RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}
-          railway link --project=${{ secrets.RAILWAY_PROJECT_ID }}
-          railway up --service=${{ env.SERVER }}
+      # - name: Deploy Server to Railway
+      #   run: |
+      #     cd server
+      #     export RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}
+      #     railway link --project=${{ secrets.RAILWAY_PROJECT_ID }}
+      #     railway up --service=${{ env.SERVER }}
 
       - name: Deploy Lama Cleaner to Railway
         run: |
