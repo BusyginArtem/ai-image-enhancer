@@ -124,7 +124,7 @@ jobs:
 
       - name: Deploy Main Server to Railway
         run: |
-          cd server
+          cd server/
           railway up --service=${{ env.SERVER_SERVICE }}
 
       - name: Deploy Lama Cleaner to Railway
