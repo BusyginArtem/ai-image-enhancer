@@ -115,7 +115,7 @@ jobs:
         run: |
           cd server
           pwd
-          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.SERVER_SERVICE }}
+          railway link --project=${{ secrets.RAILWAY_PROJECT_ID }} --service=${{ env.SERVER_SERVICE }}
           railway up --verbose
 
       # - name: Deploy Lama Cleaner to Railway
