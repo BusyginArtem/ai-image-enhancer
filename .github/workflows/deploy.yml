@@ -114,9 +114,11 @@ jobs:
       - name: Deploy Main Server to Railway
         run: |
           cd server
-          railway up --service=${{ env.SERVER_SERVICE }}
+          pwd
+          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.SERVER_SERVICE }}
+          railway up --verbose
 
-      - name: Deploy Lama Cleaner to Railway
-        run: |
-          cd server/lama-cleaner
-          railway up --service=${{ env.LAMA_CLEANER_SERVICE }}
+      # - name: Deploy Lama Cleaner to Railway
+      #   run: |
+      #     cd server/lama-cleaner
+      #     railway up --service=${{ env.LAMA_CLEANER_SERVICE }} --verbose
