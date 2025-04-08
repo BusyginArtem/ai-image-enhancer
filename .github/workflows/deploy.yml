@@ -118,6 +118,7 @@ jobs:
       - name: Deploy Main Server to Railway
         run: |
           cd server
+          export RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}
           railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.SERVER_SERVICE }}
           railway up
 
