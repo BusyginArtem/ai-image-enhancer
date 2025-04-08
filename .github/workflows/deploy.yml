@@ -110,10 +110,10 @@ jobs:
       - name: Verify Railway Status
         run: railway status
 
-      - name: Verify Railway Authentication
-        run: railway whoami
-        env:
-          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+      # - name: Verify Railway Authentication
+      #   run: railway whoami
+      #   env:
+      #     RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
 
       - name: Deploy Main Server to Railway
         run: |
