@@ -43,11 +43,11 @@ jobs:
       - name: Verify Railway Status
         run: railway status
 
-      - name: Deploy Main Server to Railway
-        run: |
-          cd server
-          pwd
-          railway up --service=${{ env.SERVER_SERVICE }} --verbose
+      # - name: Deploy Main Server to Railway
+      #   run: |
+      #     cd server
+      #     pwd
+      #     railway up --service=${{ env.SERVER_SERVICE }} --verbose
 
       - name: Deploy Lama Cleaner to Railway
         run: |
