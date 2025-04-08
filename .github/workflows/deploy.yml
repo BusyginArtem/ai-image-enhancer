@@ -23,9 +23,6 @@ jobs:
           cd client
           vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
 
-  # VERSION 2
-  # RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
-  # RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
   deploy-server:
     runs-on: ubuntu-latest
     container:
@@ -33,7 +30,7 @@ jobs:
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     env:
-      RAILWAY_TOKEN: 8438468e-e8b1-4c0d-9d4d-84cdde7a7f9e
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       SERVER_SERVICE: server
       LAMA_CLEANER_SERVICE: lama-cleaner
     steps:
@@ -43,11 +40,11 @@ jobs:
       - name: Verify Railway Status
         run: railway status
 
-      # - name: Deploy Main Server to Railway
-      #   run: |
-      #     cd server
-      #     pwd
-      #     railway up --service=${{ env.SERVER_SERVICE }} --verbose
+      - name: Deploy Main Server to Railway
+        run: |
+          cd server
+          pwd
+          railway up --service=${{ env.SERVER_SERVICE }} --verbose
 
       - name: Deploy Lama Cleaner to Railway
         run: |
