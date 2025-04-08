@@ -111,17 +111,6 @@ jobs:
       - name: Verify Railway Status
         run: railway status
 
-      - name: Verify Server Directory
-        run: |
-          ls -la
-          if [ -d "server" ]; then
-            echo "Server directory exists"
-            ls -la server
-          else
-            echo "Server directory not found"
-            exit 1
-          fi
-
       - name: Deploy Main Server to Railway
         run: |
           cd server
