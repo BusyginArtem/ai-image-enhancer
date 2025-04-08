@@ -100,6 +100,7 @@ jobs:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      # RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
       SERVER_SERVICE: server
       LAMA_CLEANER_SERVICE: lama-cleaner
     steps:
@@ -111,6 +112,8 @@ jobs:
 
       - name: Verify Railway Authentication
         run: railway whoami
+        env:
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
 
       - name: Deploy Main Server to Railway
         run: |
