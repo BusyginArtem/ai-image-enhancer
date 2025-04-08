@@ -111,16 +111,23 @@ jobs:
       - name: Verify Railway Status
         run: railway status
 
-      # - name: Verify Railway Authentication
-      #   run: railway whoami
+      - name: Verify Server Directory
+        run: |
+          ls -la
+          if [ -d "server" ]; then
+            echo "Server directory exists"
+            ls -la server
+          else
+            echo "Server directory not found"
+            exit 1
+          fi
 
       - name: Deploy Main Server to Railway
         run: |
           cd server
           railway up --service=${{ env.SERVER_SERVICE }}
 
-      # - name: Deploy Lama Cleaner to Railway
-      #   run: |
-      #     cd server/lama-cleaner
-      #     railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.LAMA_CLEANER_SERVICE }}
-      #     railway up
+      - name: Deploy Lama Cleaner to Railway
+        run: |
+          cd server/lama-cleaner
+          railway up --service=${{ env.LAMA_CLEANER_SERVICE }}
