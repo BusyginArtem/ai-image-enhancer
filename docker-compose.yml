@@ -13,7 +13,7 @@ services:
   server:
     build:
       context: ./server
-      dockerfile: Dockerfile.server
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     depends_on:
@@ -25,8 +25,8 @@ services:
 
   lama-cleaner:
     build:
-      context: ./server
-      dockerfile: Dockerfile.lama
+      context: ./server/lama-cleaner
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     volumes:

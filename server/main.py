@@ -25,6 +25,10 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+@app.get("/")
+def root():
+    return {"message": "Hello World"}
+
 @app.post("/upload")
 def upload_image(file: UploadFile = File(...)):
     """Uploading the image to the server."""

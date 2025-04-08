@@ -16,6 +16,8 @@ export async function POST(req: Request) {
     body: buffer,
   });
 
+  if (!response.ok) return NextResponse.json({ error: "Upload failed" }, { status: 400 });
+
   const result = await response.json();
   return NextResponse.json(result);
 }

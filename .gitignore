@@ -7,5 +7,5 @@
 *.log
 
 # Specific root-level ignores
-lama-cleaner
-lama-cleaner-cache
+/lama-cleaner
+/lama-cleaner-cache
