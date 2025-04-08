@@ -120,8 +120,8 @@ jobs:
           railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.SERVER_SERVICE }}
           railway up
 
-      - name: Deploy Lama Cleaner to Railway
-        run: |
-          cd server/lama-cleaner
-          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.LAMA_CLEANER_SERVICE }}
-          railway up
+      # - name: Deploy Lama Cleaner to Railway
+      #   run: |
+      #     cd server/lama-cleaner
+      #     railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service ${{ env.LAMA_CLEANER_SERVICE }}
+      #     railway up
