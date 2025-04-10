@@ -18,6 +18,11 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel
 
+      - name: Verify Vercel Token
+        run: echo "VERCEL_TOKEN is set"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
       - name: Deploy to Vercel
         run: |
           cd client
