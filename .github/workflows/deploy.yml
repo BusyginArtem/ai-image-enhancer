@@ -7,6 +7,13 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      deploy_server:
+        description: 'Deploy server to Railway (true/false)'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   deploy-client:
@@ -18,30 +25,15 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Verify Vercel Token
-        run: echo "VERCEL_TOKEN is set"
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-
-      - name: Verify client Directory
-        run: |
-          ls -la
-          if [ -d "client" ]; then
-            echo "Client directory exists"
-            ls -la client
-          else
-            echo "Client directory not found"
-            exit 1
-          fi
-
       - name: Deploy to Vercel
         run: |
           cd client
-          vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }} --cwd=.
+          vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
   deploy-server:
+    if: github.event_name != 'workflow_dispatch' || inputs.deploy_server == 'true'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/railwayapp/cli:3.21.0
@@ -54,9 +46,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Verify Railway Status
-        run: railway status
 
       - name: Deploy Main Server to Railway
         run: |
