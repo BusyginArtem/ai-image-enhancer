@@ -18,10 +18,28 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel
 
+      - name: Verify Vercel Token
+        run: echo "VERCEL_TOKEN is set"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Verify client Directory
+        run: |
+          ls -la
+          if [ -d "client" ]; then
+            echo "Client directory exists"
+            ls -la client
+          else
+            echo "Client directory not found"
+            exit 1
+          fi
+
       - name: Deploy to Vercel
         run: |
           cd client
-          vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+          vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }} --cwd=.
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
   deploy-server:
     runs-on: ubuntu-latest
@@ -43,7 +61,6 @@ jobs:
       - name: Deploy Main Server to Railway
         run: |
           cd server
-          pwd
           railway up --service=${{ env.SERVER_SERVICE }} --verbose
 
       - name: Deploy Lama Cleaner to Railway
