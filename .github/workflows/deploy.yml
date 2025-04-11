@@ -11,13 +11,6 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      deploy_server:
-        description: 'Deploy server to Railway (true/false)'
-        required: false
-        default: true
-        type: boolean
 
 jobs:
   deploy-client:
@@ -51,7 +44,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
   deploy-server:
-    if: github.event_name != 'workflow_dispatch' || inputs.deploy_server == 'true'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/railwayapp/cli:3.21.0
