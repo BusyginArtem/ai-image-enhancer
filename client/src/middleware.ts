@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import authConfig from "./lib/auth.config";
 
-const protectedRoutes = ["/"];
+const protectedRoutes = ["/image-editor"];
 const authRoutes = ["/sign-in", "/sign-up"];
 
 export const { auth } = NextAuth(authConfig);
@@ -12,10 +12,12 @@ export default async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
   const session = await auth();
-console.log('session >>>>>>>>>>>>>>>>>>>>>', session)
+
   const callbackUrl = searchParams.get("callbackUrl");
 
-  const isProtected = protectedRoutes.some((route) => pathname.startsWith(route));
+  const isProtected = protectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
   const isAuthPage = authRoutes.some((route) => pathname.startsWith(route));
 
   if (session && isAuthPage) {
@@ -26,7 +28,7 @@ console.log('session >>>>>>>>>>>>>>>>>>>>>', session)
     }
   }
 
-  if (!session && isProtected) {
+  if (!session && isProtected && !isAuthPage) {
     const signInUrl = new URL("/sign-in", request.url);
     signInUrl.searchParams.set("callbackUrl", pathname);
 
@@ -37,5 +39,5 @@ console.log('session >>>>>>>>>>>>>>>>>>>>>', session)
 }
 
 export const config = {
-  matcher: ["/(.*)", "/sign-in", "/sign-up"],
+  matcher: ["/image-editor(.*)", "/sign-in", "/sign-up"],
 };

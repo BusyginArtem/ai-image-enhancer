@@ -5,5 +5,9 @@ export async function hashPassword(password: string) {
 }
 
 export async function verifyPasswords(password: string, hashedPassword: string) {
+  if (!password || !hashedPassword) {
+    return false
+  }
+
   return await compare(password, hashedPassword);
 }

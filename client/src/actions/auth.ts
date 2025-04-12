@@ -3,9 +3,9 @@
 import { CredentialsSignin } from "next-auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
-import { hashPassword } from "@/lib/auth-password";
+// import { hashPassword } from "@/lib/auth-password";
 import { AuthFormState } from "@/lib/definitions";
-import { connectMongoDb } from "@/lib/mongodb";
+// import { connectMongoDb } from "@/lib/mongodb";
 import { signInFormSchema, signUpFormSchema } from "@/lib/validation";
 import { signIn } from "@/lib/auth";
 
@@ -59,6 +59,7 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
   const validatedFields = signUpFormSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
+    password_confirmation: formData.get("password_confirmation"),
   });
 
   if (!validatedFields.success) {
@@ -68,12 +69,22 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
     };
   }
 
-  const { email, password } = validatedFields.data;
+  const { password, password_confirmation } = validatedFields.data;
 
-  let conn: MongoClient | undefined;
+  if (password !== password_confirmation) {
+    return {
+      success: false,
+      errors: {
+        password_confirmation: ["Passwords don't match"],
+      },
+    };
+  }
+
+  let conn: undefined | null;
 
   try {
-    conn = await connectMongoDb();
+    // conn = await connectMongoDb();
+    conn = null;
   } catch (error) {
     return {
       success: false,
@@ -81,24 +92,24 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
     };
   }
 
-  if (!conn) {
-    return {
-      success: false,
-      message: "Could not connect to database.",
-    };
-  }
+  // if (!conn) {
+  //   return {
+  //     success: false,
+  //     message: "Could not connect to database.",
+  //   };
+  // }
 
-  const db = conn.db();
+  // const db = null;
 
   try {
-    await db.collection("users").insertOne({
-      email,
-      password: await hashPassword(password),
-    });
+    // await db.collection("users").insertOne({
+    //   email,
+    //   password: await hashPassword(password),
+    // });
 
     await signIn("credentials", formData);
 
-    conn.close();
+    // conn.close();
 
     return {
       success: true,
@@ -109,21 +120,21 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
       throw error;
     }
 
-    if (error instanceof MongoError && "code" in error && error.code === 11000) {
-      return {
-        success: false,
-        errors: {
-          email: ["Email is taken!"],
-        },
-      };
-    }
+    // if (error instanceof MongoError && "code" in error && error.code === 11000) {
+    //   return {
+    //     success: false,
+    //     errors: {
+    //       email: ["Email is taken!"],
+    //     },
+    //   };
+    // }
 
     return {
       success: false,
       message: "Something went wrong. Try again.",
     };
   } finally {
-    conn.close();
+    // conn.close();
   }
 }
 

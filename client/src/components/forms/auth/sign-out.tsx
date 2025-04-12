@@ -3,7 +3,7 @@
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 const SignOut = () => {
   const router = useRouter();
@@ -14,8 +14,12 @@ const SignOut = () => {
   };
 
   return (
-    <div className='flex justify-center'>
-      <Button variant='destructive' onClick={handleSignOut} className='w-[5.5rem]'>
+    <div className="flex justify-center">
+      <Button
+        variant="destructive"
+        onClick={handleSignOut}
+        className="w-[5.5rem]"
+      >
         Sign Out
       </Button>
     </div>

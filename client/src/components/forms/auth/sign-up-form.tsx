@@ -8,16 +8,20 @@ import { type SignUpFormSchema, signUpFormSchema } from "@/lib/validation";
 import { signUpAction } from "@/actions/auth";
 import { AuthFormState } from "@/lib/definitions";
 import FormInput from "../../ui/form-input";
-import Button from "../../ui/button";
+import { Button } from "../../ui/button";
 
 export default function SignUpForm() {
-  const [formState, formAction, isPending] = useActionState<AuthFormState, FormData>(signUpAction, undefined);
+  const [formState, formAction, isPending] = useActionState<
+    AuthFormState,
+    FormData
+  >(signUpAction, undefined);
 
   const form = useForm<SignUpFormSchema>({
     resolver: zodResolver(signUpFormSchema),
     defaultValues: {
       email: "",
       password: "",
+      password_confirmation: "",
     },
   });
 
@@ -26,7 +30,10 @@ export default function SignUpForm() {
   useEffect(() => {
     if (!formState?.success) {
       if (formState?.errors?.email) {
-        form.setError("email", { type: "custom", message: formState.errors.email?.[0] });
+        form.setError("email", {
+          type: "custom",
+          message: formState.errors.email?.[0],
+        });
       }
     }
   }, [formState, form]);
@@ -43,29 +50,37 @@ export default function SignUpForm() {
           });
         })(evt);
       }}
-      className='space-y-2'
+      className="space-y-2"
     >
       <FormInput
-        placeholder='Email'
-        type='email'
-        autoComplete='email'
+        placeholder="Email"
+        type="email"
+        autoComplete="email"
         error={form.formState?.errors?.email}
         {...form.register("email")}
       />
 
       <FormInput
-        placeholder='Password'
-        type='password'
-        autoComplete='new-password'
+        placeholder="Password"
+        type="password"
+        autoComplete="new-password"
         error={form.formState?.errors?.password}
         {...form.register("password")}
       />
 
-      <Button disabled={isPending} type='submit' className='w-full'>
+      <FormInput
+        placeholder="Confirm Password"
+        type="password"
+        autoComplete="new-password"
+        error={form.formState?.errors?.password_confirmation}
+        {...form.register("password_confirmation")}
+      />
+
+      <Button disabled={isPending} type="submit" className="w-full">
         Sign Up
       </Button>
 
-      <span className='text-red-400 text-sm h-4 inline-block w-full'>
+      <span className="inline-block h-4 w-full text-sm text-red-400">
         {!formState?.success ? formState?.message : ""}
       </span>
     </form>
