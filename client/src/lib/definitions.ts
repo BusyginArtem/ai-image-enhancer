@@ -13,6 +13,7 @@ export type AuthFormState =
       errors?: {
         email?: string[];
         password?: string[];
+        password_confirmation?: string[];
       };
       message?: string;
       fields?: Record<string, string>;

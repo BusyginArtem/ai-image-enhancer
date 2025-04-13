@@ -5,8 +5,7 @@ import { ReactNode } from "react";
 import { Roboto } from "next/font/google";
 
 import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/theme-provider";
-import ClientSessionProvider from "@/components/client-session-provider";
+import Providers from "@/components/providers";
 
 const roboto = Roboto({
   weight: ["500", "700", "900"],
@@ -30,16 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           roboto.variable,
         )}
       >
-        <ClientSessionProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </ClientSessionProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

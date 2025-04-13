@@ -1,15 +1,12 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-import { hashPassword, verifyPasswords } from "@/lib/auth-password";
 import { FirestoreAdapter } from "@auth/firebase-adapter";
 import authConfig from "./auth.config";
-import { adminFirestoreAuth, firestoreAdminDB } from "./firebase.admin";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "./firebase";
+import { adminDb, adminFirestoreAuth } from "./firebase.admin";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: FirestoreAdapter(firestoreAdminDB),
+  adapter: FirestoreAdapter(adminDb),
   debug: true,
   session: {
     strategy: "jwt",
@@ -19,20 +16,39 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/sign-in",
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account, profile, email, credentials }) {
+      // console.log("user >>>>>>>>>>>>>>>>>>>>>", user);
+      // console.log("account >>>>>>>>>>>>>>>>>>>>>", account);
+      // console.log("profile >>>>>>>>>>>>>>>>>>>>>", profile);
+      // console.log("email >>>>>>>>>>>>>>>>>>>>>", email);
+      // console.log("credentials >>>>>>>>>>>>>>>>>>>>>", credentials);
       if (account?.provider === "credentials") {
+        // const accountData = {
+        //   userId: user.id,
+        //   type: "credentials",
+        //   provider: "credentials",
+        //   providerAccountId: user.id,
+        // };
+
+        // adminDb.collection("accounts").add(accountData);
+
         return true;
       }
 
       if (account?.provider === "github") {
+        // TODO add logic
         return true;
       }
 
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.uid = user.id;
+      }
+
+      if (account?.provider === "credentials") {
+        token.credentials = true;
       }
 
       return token;
@@ -43,12 +59,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           session.user.id = token.sub;
         }
 
+        const firebaseToken = await adminFirestoreAuth.createCustomToken(
+          token.sub as string,
+        );
+        session.firebaseToken = firebaseToken;
+
         if (token.provider === "credentials") {
         } else if (token.provider === "github") {
-          const firebaseToken = await adminFirestoreAuth.createCustomToken(
-            token.sub as string,
-          );
-          session.firebaseToken = firebaseToken;
         }
       }
 
@@ -67,37 +84,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const documentSnapshots = await getDocs(
-          query(
-            collection(db, "users"),
-            where("email", "==", credentials.email),
-          ),
-        );
+        const userSnapshot = await adminDb
+          .collection("users")
+          .where("email", "==", credentials.email)
+          .get();
 
-        if (documentSnapshots.empty) {
-          const newUser = {
-            email: credentials.email,
-            password: await hashPassword(credentials.password as string),
-          };
-
-          const userRef = await addDoc(collection(db, "users"), newUser);
-
-          return {
-            id: userRef.id,
-            email: credentials.email,
-          };
+        if (userSnapshot.empty) {
+          return null;
         }
 
-        const user = documentSnapshots.docs[0].data();
-
-        // const isMatch = await verifyPasswords(
-        //   credentials.password as string,
-        //   user.password,
-        // );
-
-        // if (!isMatch) {
-        //   return null;
-        // }
+        const user = userSnapshot.docs[0].data();
 
         return {
           id: user.id,

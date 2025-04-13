@@ -1,14 +1,17 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
 
 import { type SignUpFormSchema, signUpFormSchema } from "@/lib/validation";
 import { signUpAction } from "@/actions/auth";
 import { AuthFormState } from "@/lib/definitions";
 import FormInput from "../../ui/form-input";
 import { Button } from "../../ui/button";
+import { APP_PATH } from "@/lib/constants";
 
 export default function SignUpForm() {
   const [formState, formAction, isPending] = useActionState<
@@ -25,6 +28,8 @@ export default function SignUpForm() {
     },
   });
 
+  const router = useRouter();
+
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -37,6 +42,13 @@ export default function SignUpForm() {
       }
     }
   }, [formState, form]);
+
+  useEffect(() => {
+    if (formState?.success) {
+      toast.success(formState.message);
+      router.push(APP_PATH.SIGN_IN);
+    }
+  }, [formState?.success, router]);
 
   return (
     <form

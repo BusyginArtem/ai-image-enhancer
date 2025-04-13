@@ -1,13 +1,14 @@
 "use server";
 
-import { CredentialsSignin } from "next-auth";
+import { Timestamp } from "firebase-admin/firestore";
+import { AuthError } from "next-auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
-// import { hashPassword } from "@/lib/auth-password";
-import { AuthFormState } from "@/lib/definitions";
-// import { connectMongoDb } from "@/lib/mongodb";
-import { signInFormSchema, signUpFormSchema } from "@/lib/validation";
 import { signIn } from "@/lib/auth";
+import { hashPassword, verifyPasswords } from "@/lib/auth-password";
+import { AuthFormState } from "@/lib/definitions";
+import { adminDb } from "@/lib/firebase.admin";
+import { signInFormSchema, signUpFormSchema } from "@/lib/validation";
 
 export async function signInAction(_state: AuthFormState, formData: FormData) {
   const validatedFields = signInFormSchema.safeParse({
@@ -22,23 +23,61 @@ export async function signInAction(_state: AuthFormState, formData: FormData) {
     };
   }
 
+  const { email, password } = validatedFields.data;
+
   try {
-    await signIn("credentials", formData);
+    // const oauthUserSnapshot = await adminDb
+    //   .collection("users")
+    //   .where("email", "==", email)
+    //   .get();
+
+    // if (!oauthUserSnapshot.empty) {
+    //   return {
+    //     success: false,
+    //     message: "You've already registered with OAth Provider.",
+    //   };
+    // }
+
+    const userSnapshot = await adminDb
+      .collection("users")
+      .where("email", "==", email)
+      .get();
+
+    if (userSnapshot.empty) {
+      return {
+        success: false,
+        message: "Email or password is incorrect.",
+      };
+    }
+
+    const user = userSnapshot.docs[0].data();
+
+    const isMatch = await verifyPasswords(password as string, user.password);
+
+    if (!isMatch) {
+      return {
+        success: false,
+        message: "Email or password is incorrect.",
+      };
+    }
+
+    await signIn("credentials", {
+      email: validatedFields.data.email,
+      password: validatedFields.data.password,
+    });
 
     return {
       success: true,
       fields: validatedFields.data,
     };
   } catch (error) {
+    console.log("[signInAction error]:", error);
     if (isRedirectError(error)) {
       throw error;
     }
 
-    if (error instanceof CredentialsSignin) {
-      return {
-        success: false,
-        message: "Email or password is incorrect.",
-      };
+    if (error instanceof AuthError && error.type === "CredentialsSignin") {
+      return { success: false, error: "Invalid credentials" };
     }
 
     if (error instanceof Error) {
@@ -69,7 +108,7 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
     };
   }
 
-  const { password, password_confirmation } = validatedFields.data;
+  const { email, password, password_confirmation } = validatedFields.data;
 
   if (password !== password_confirmation) {
     return {
@@ -80,61 +119,51 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
     };
   }
 
-  let conn: undefined | null;
-
   try {
-    // conn = await connectMongoDb();
-    conn = null;
-  } catch (error) {
-    return {
-      success: false,
-      message: (error as Error).message,
+    const existingUserSnapshot = await adminDb
+      .collection("users")
+      .where("email", "==", email)
+      .get();
+
+    if (!existingUserSnapshot.empty) {
+      return {
+        success: false,
+        message: "You've already registered. Log in.",
+      };
+    }
+
+    const newUser = {
+      email: email,
+      password: await hashPassword(password as string),
+      createdAt: Timestamp.now(),
+      name: "",
+      emailVerified: null,
+      image: "",
     };
-  }
 
-  // if (!conn) {
-  //   return {
-  //     success: false,
-  //     message: "Could not connect to database.",
-  //   };
-  // }
+    adminDb.collection("users").add(newUser);
 
-  // const db = null;
-
-  try {
-    // await db.collection("users").insertOne({
-    //   email,
-    //   password: await hashPassword(password),
+    // await signIn("credentials", {
+    //   email: validatedFields.data.email,
+    //   password: validatedFields.data.password,
+    //   redirect: false,
     // });
-
-    await signIn("credentials", formData);
-
-    // conn.close();
 
     return {
       success: true,
       fields: validatedFields.data,
+      message: "You've signed up successfully.",
     };
   } catch (error) {
+    console.log("[signUpAction error]:", error);
     if (isRedirectError(error)) {
       throw error;
     }
-
-    // if (error instanceof MongoError && "code" in error && error.code === 11000) {
-    //   return {
-    //     success: false,
-    //     errors: {
-    //       email: ["Email is taken!"],
-    //     },
-    //   };
-    // }
 
     return {
       success: false,
       message: "Something went wrong. Try again.",
     };
-  } finally {
-    // conn.close();
   }
 }
 

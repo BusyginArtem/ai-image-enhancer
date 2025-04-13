@@ -9,3 +9,6 @@
 # Specific root-level ignores
 /lama-cleaner
 /lama-cleaner-cache
+
+# vscode
+.vscode

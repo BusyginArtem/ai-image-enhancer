@@ -1,12 +1,12 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition, useActionState, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
-import { type SignUpFormSchema, signUpFormSchema } from "@/lib/validation";
 import { signInAction } from "@/actions/auth";
 import { AuthFormState } from "@/lib/definitions";
+import { signInFormSchema, type SignInFormSchema } from "@/lib/validation";
 import { Button } from "../../ui/button";
 import FormInput from "../../ui/form-input";
 
@@ -16,8 +16,8 @@ export default function SignInForm() {
     FormData
   >(signInAction, undefined);
 
-  const form = useForm<SignUpFormSchema>({
-    resolver: zodResolver(signUpFormSchema),
+  const form = useForm<SignInFormSchema>({
+    resolver: zodResolver(signInFormSchema),
     defaultValues: {
       email: "",
       password: "",

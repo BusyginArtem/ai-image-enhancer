@@ -10,7 +10,7 @@ const serviceAccount: ServiceAccount = {
   privateKey: env.AUTH_FIREBASE_PRIVATE_KEY,
 };
 
-const firestoreAdminDB = initFirestore({
+const adminDb = initFirestore({
   credential: cert(serviceAccount),
 });
 
@@ -24,4 +24,4 @@ if (!admin.apps.length) {
 
 const adminFirestoreAuth = admin.auth(app);
 
-export { firestoreAdminDB, adminFirestoreAuth };
+export { adminDb, adminFirestoreAuth };

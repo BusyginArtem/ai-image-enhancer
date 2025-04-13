@@ -15,10 +15,8 @@ export default async function middleware(request: NextRequest) {
 
   const callbackUrl = searchParams.get("callbackUrl");
 
-  const isProtected = protectedRoutes.some((route) =>
-    pathname.startsWith(route),
-  );
-  const isAuthPage = authRoutes.some((route) => pathname.startsWith(route));
+  const isProtected = protectedRoutes.includes(pathname);
+  const isAuthPage = authRoutes.includes(pathname);
 
   if (session && isAuthPage) {
     if (callbackUrl) {
@@ -39,5 +37,5 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/image-editor(.*)", "/sign-in", "/sign-up"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
