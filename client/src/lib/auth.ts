@@ -17,21 +17,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
-      // console.log("user >>>>>>>>>>>>>>>>>>>>>", user);
-      // console.log("account >>>>>>>>>>>>>>>>>>>>>", account);
-      // console.log("profile >>>>>>>>>>>>>>>>>>>>>", profile);
-      // console.log("email >>>>>>>>>>>>>>>>>>>>>", email);
+      console.log("user >>>>>>>>>>>>>>>>>>>>>", user);
+      console.log("account >>>>>>>>>>>>>>>>>>>>>", account);
+      console.log("profile >>>>>>>>>>>>>>>>>>>>>", profile);
+      console.log("email >>>>>>>>>>>>>>>>>>>>>", email);
       // console.log("credentials >>>>>>>>>>>>>>>>>>>>>", credentials);
       if (account?.provider === "credentials") {
-        // const accountData = {
-        //   userId: user.id,
-        //   type: "credentials",
-        //   provider: "credentials",
-        //   providerAccountId: user.id,
-        // };
-
-        // adminDb.collection("accounts").add(accountData);
-
         return true;
       }
 
@@ -83,6 +74,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
+
+        //
 
         const userSnapshot = await adminDb
           .collection("users")

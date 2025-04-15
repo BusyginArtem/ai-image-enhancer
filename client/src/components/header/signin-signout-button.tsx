@@ -1,21 +1,13 @@
-// "use client";
-
-// import { useSession } from "next-auth/react";
 import Link from "next/link";
 
+import { auth } from "@/lib/auth";
 import { APP_PATH } from "@/lib/constants";
 import { Button } from "../ui/button";
 import { SignOut } from "./sign-out";
-import { auth } from "@/lib/auth";
 
 export default async function SignInOutButton() {
-  // const { data: session } = useSession();
   const session = await auth();
-  console.log(
-    "%c SignInOutButton session",
-    "color: green; font-weight: bold;",
-    session,
-  );
+
   return session ? (
     <SignOut />
   ) : (

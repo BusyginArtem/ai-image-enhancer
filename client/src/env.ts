@@ -7,6 +7,8 @@ const env = {
   AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET as string,
   AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID as string,
   AUTH_FIREBASE_PROJECT_ID: process.env.AUTH_FIREBASE_PROJECT_ID as string,
+  AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET as string,
+  AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID as string,
 };
 
 if (
@@ -16,7 +18,9 @@ if (
   !env.AUTH_FIREBASE_CLIENT_EMAIL ||
   !env.AUTH_FIREBASE_PRIVATE_KEY ||
   !env.AUTH_GITHUB_SECRET ||
-  !env.AUTH_GITHUB_ID
+  !env.AUTH_GITHUB_ID ||
+  !env.AUTH_GOOGLE_SECRET ||
+  !env.AUTH_GOOGLE_ID
 ) {
   throw new Error("Missing environment variables");
 }

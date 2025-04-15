@@ -1,17 +1,17 @@
 "use client";
 
-import { startTransition, useActionState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { startTransition, useActionState, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import { type SignUpFormSchema, signUpFormSchema } from "@/lib/validation";
 import { signUpAction } from "@/actions/auth";
-import { AuthFormState } from "@/lib/definitions";
-import FormInput from "../../ui/form-input";
-import { Button } from "../../ui/button";
 import { APP_PATH } from "@/lib/constants";
+import { AuthFormState } from "@/lib/definitions";
+import { signUpFormSchema, type SignUpFormSchema } from "@/lib/validation";
+import { Button } from "../../ui/button";
+import FormInput from "../../ui/form-input";
 
 export default function SignUpForm() {
   const [formState, formAction, isPending] = useActionState<

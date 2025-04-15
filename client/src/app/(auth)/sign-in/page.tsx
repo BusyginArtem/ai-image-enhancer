@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import GithubSignIn from "@/components/forms/auth/github-sign-in";
-import { Button } from "@/components/ui/button";
+import AuthProviders from "@/components/forms/auth/providers";
 import SignInForm from "@/components/forms/auth/sign-in-form";
+import { Button } from "@/components/ui/button";
 import { APP_PATH } from "@/lib/constants";
 
 export default async function SignInPage() {
@@ -10,7 +10,7 @@ export default async function SignInPage() {
     <div className="border-border mx-auto w-full max-w-sm space-y-6 rounded-sm border-2 p-8">
       <h1 className="mb-6 text-center text-2xl font-bold">Sign In</h1>
 
-      <GithubSignIn />
+      <AuthProviders />
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">

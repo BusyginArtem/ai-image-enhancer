@@ -2,9 +2,9 @@
 
 import { useActionState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Github } from "@/components/ui/github";
 import { signInGitHub } from "@/actions/auth";
+import Github from "@/components/forms/auth/icons/github";
+import { Button } from "@/components/ui/button";
 
 const GithubSignIn = () => {
   const [, formAction, isPending] = useActionState(signInGitHub, undefined);

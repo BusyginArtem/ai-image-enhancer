@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import AuthProviders from "@/components/forms/auth/providers";
 import SignUpForm from "@/components/forms/auth/sign-up-form";
-import GithubSignIn from "@/components/forms/auth/github-sign-in";
+import { Button } from "@/components/ui/button";
 import { APP_PATH } from "@/lib/constants";
 
 export default async function SignUpPage() {
@@ -10,7 +10,7 @@ export default async function SignUpPage() {
     <div className="border-border mx-auto w-full max-w-sm space-y-6 rounded-sm border-2 p-8 shadow-md">
       <h1 className="mb-6 text-center text-2xl font-bold">Create Account</h1>
 
-      <GithubSignIn />
+      <AuthProviders />
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">

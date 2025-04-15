@@ -2,13 +2,16 @@
 
 import { Timestamp } from "firebase-admin/firestore";
 import { AuthError } from "next-auth";
+import { signOut } from "next-auth/react";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import { signIn } from "@/lib/auth";
 import { hashPassword, verifyPasswords } from "@/lib/auth-password";
 import { AuthFormState } from "@/lib/definitions";
+import { auth } from "@/lib/firebase";
 import { adminDb } from "@/lib/firebase.admin";
 import { signInFormSchema, signUpFormSchema } from "@/lib/validation";
+import { signOut as signOutFirebase } from "firebase/auth";
 
 export async function signInAction(_state: AuthFormState, formData: FormData) {
   const validatedFields = signInFormSchema.safeParse({
@@ -26,18 +29,6 @@ export async function signInAction(_state: AuthFormState, formData: FormData) {
   const { email, password } = validatedFields.data;
 
   try {
-    // const oauthUserSnapshot = await adminDb
-    //   .collection("users")
-    //   .where("email", "==", email)
-    //   .get();
-
-    // if (!oauthUserSnapshot.empty) {
-    //   return {
-    //     success: false,
-    //     message: "You've already registered with OAth Provider.",
-    //   };
-    // }
-
     const userSnapshot = await adminDb
       .collection("users")
       .where("email", "==", email)
@@ -128,7 +119,8 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
     if (!existingUserSnapshot.empty) {
       return {
         success: false,
-        message: "You've already registered. Log in.",
+        message:
+          "You’ve already registered. Please log in with your email and password or your chosen authentication provider.",
       };
     }
 
@@ -136,12 +128,22 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
       email: email,
       password: await hashPassword(password as string),
       createdAt: Timestamp.now(),
-      name: "",
+      name: null,
       emailVerified: null,
-      image: "",
+      image: null,
     };
 
-    adminDb.collection("users").add(newUser);
+    const userRef = await adminDb.collection("users").add(newUser);
+
+    const newAccount = {
+      userId: userRef.id,
+      provider: "credentials",
+      type: "credentials",
+      subscription: "free",
+      providerAccountId: userRef.id,
+    };
+
+    adminDb.collection("accounts").add(newAccount);
 
     // await signIn("credentials", {
     //   email: validatedFields.data.email,
@@ -167,28 +169,32 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
   }
 }
 
-// export const signOutAction = async () => {
-//   try {
-//     const session = await auth();
-
-//     if (session) {
-//       await update({
-//         user: null,
-//       });
-//     }
-
-//     await signOut({ redirect: false });
-//   } catch (error) {
-//     if (isRedirectError(error)) {
-//       throw error;
-//     }
-//     console.log("[Error]:", error);
-//   }
-// };
+export const signOutAction = async () => {
+  try {
+    await signOut({ redirect: false });
+    await signOutFirebase(auth);
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+    console.log("[Error]:", error);
+  }
+};
 
 export const signInGitHub = async () => {
   try {
     await signIn("github");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+    console.log("[Error]:", error);
+  }
+};
+
+export const signInGoogle = async () => {
+  try {
+    await signIn("google");
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
