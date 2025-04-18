@@ -16,11 +16,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/sign-in",
   },
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log("user >>>>>>>>>>>>>>>>>>>>>", user);
-      console.log("account >>>>>>>>>>>>>>>>>>>>>", account);
-      console.log("profile >>>>>>>>>>>>>>>>>>>>>", profile);
-      console.log("email >>>>>>>>>>>>>>>>>>>>>", email);
+    async signIn({ account }) {
+      // console.log("user >>>>>>>>>>>>>>>>>>>>>", user);
+      // console.log("account >>>>>>>>>>>>>>>>>>>>>", account);
+      // console.log("profile >>>>>>>>>>>>>>>>>>>>>", profile);
+      // console.log("email >>>>>>>>>>>>>>>>>>>>>", email);
       // console.log("credentials >>>>>>>>>>>>>>>>>>>>>", credentials);
       if (account?.provider === "credentials") {
         return true;

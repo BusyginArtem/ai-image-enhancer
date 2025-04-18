@@ -26,5 +26,5 @@ export default function useAuthError() {
         toastId,
       });
     }
-  }, [error]);
+  }, [error, toastId]);
 }

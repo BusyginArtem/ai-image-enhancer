@@ -48,7 +48,7 @@ export default function SignUpForm() {
       toast.success(formState.message);
       router.push(APP_PATH.SIGN_IN);
     }
-  }, [formState?.success, router]);
+  }, [formState?.success, router, formState?.message]);
 
   return (
     <form

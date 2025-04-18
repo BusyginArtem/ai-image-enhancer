@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import AuthProviders from "@/components/forms/auth/providers";
 import SignUpForm from "@/components/forms/auth/sign-up-form";
@@ -12,13 +13,15 @@ export default async function SignUpPage() {
       <div className="text-primary text-center text-base leading-5">
         Sign up to get{" "}
         <div className="relative inline-block text-lg leading-6 font-bold">
-          <div className="absolute bottom-1 h-1 w-full bg-chart-2 opacity-50"></div>
+          <div className="bg-chart-2 absolute bottom-1 h-1 w-full opacity-50"></div>
           30 free
         </div>{" "}
         images
       </div>
 
-      <AuthProviders />
+      <Suspense>
+        <AuthProviders />
+      </Suspense>
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
