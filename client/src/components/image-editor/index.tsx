@@ -244,6 +244,7 @@ export default function CanvasEditor() {
           })}
         >
           {uploadedImage && !editedImage && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={uploadedImage}
               alt="Uploaded"
@@ -254,6 +255,7 @@ export default function CanvasEditor() {
           )}
 
           {editedImage && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={editedImage}
               alt="Edited"
@@ -264,6 +266,7 @@ export default function CanvasEditor() {
           )}
 
           {originalImageUrl && showOriginalImageFile && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={originalImageUrl}
               alt="Original"

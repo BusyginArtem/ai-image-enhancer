@@ -6,7 +6,8 @@
 
 @theme {
   --font-roboto: Roboto, system-ui, sans-serif;
-  /* --animate-slide: slide 2.7s ease-out forwards; */
+  --animate-slide-up: slide-up 0.7s ease-out forwards;
+  --animate-slide-up: show-up 0.7s ease-out forwards;
   --animate-pulsate: pulsate 1.25s ease-in-out infinite;
 
   @keyframes pulsate {
@@ -15,14 +16,25 @@
     }
   }
 
-  /* @keyframes slide {
+  @keyframes slide-up {
     0% {
-      transform: translateX(0);
+      transform: translateY(20px);
+      opacity: 0;
     }
     100% {
-      transform: translateX(200px);
+      transform: translateY(0);
+      opacity: 1;
     }
-  } */
+  }
+
+  @keyframes show-up {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 }
 
 @layer utilities {
@@ -250,6 +262,28 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.902 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --toastify-color-light: var(--background);
+  --toastify-toast-background: var(--card);
+  --toastify-text-color-light: var(--card-foreground);
+
+  --toastify-color-info: var(--chart-2); /* blueish */
+  --toastify-color-success: var(--chart-1); /* greenish */
+  --toastify-color-warning: var(--chart-4); /* orange/yellowish */
+  --toastify-color-error: var(--destructive); /* red */
+
+  --toastify-font-family: var(--font-roboto);
+  --toastify-toast-padding: 1rem;
+  --toastify-toast-bd-radius: var(--radius);
+  --toastify-toast-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+
+  --toastify-icon-color-info: var(--toastify-color-info);
+  --toastify-icon-color-success: var(--toastify-color-success);
+  --toastify-icon-color-warning: var(--toastify-color-warning);
+  --toastify-icon-color-error: var(--toastify-color-error);
+
+  --toastify-color-progress-light: var(--ring);
+  --toastify-spinner-color: var(--muted-foreground);
 }
 
 .dark {
@@ -284,6 +318,20 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  --toastify-color-dark: var(--background);
+  --toastify-toast-background: var(--card);
+  --toastify-text-color-dark: var(--card-foreground);
+
+  --toastify-color-info: var(--chart-2);
+  --toastify-color-success: var(--chart-1);
+  --toastify-color-warning: var(--chart-4);
+  --toastify-color-error: var(--destructive);
+
+  --toastify-color-progress-dark: var(--ring);
+  --toastify-spinner-color: var(--muted-foreground);
+
+  --toastify-toast-background: #fff;
 }
 
 @theme inline {

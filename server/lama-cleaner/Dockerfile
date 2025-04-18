@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir lama-cleaner
-# RUN pip install --no-cache-dir "huggingface_hub==0.14.1"
+RUN pip install --no-cache-dir "huggingface_hub==0.14.1"
 
 EXPOSE 8080
 
