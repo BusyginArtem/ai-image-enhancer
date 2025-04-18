@@ -2,10 +2,10 @@
 
 import { Timestamp } from "firebase-admin/firestore";
 import { AuthError } from "next-auth";
-import { signOut } from "next-auth/react";
+// import { signOut } from "next-auth/react";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
-import { signIn } from "@/lib/auth";
+import { signIn, signOut } from "@/lib/auth";
 import { hashPassword, verifyPasswords } from "@/lib/auth-password";
 import { AuthFormState } from "@/lib/definitions";
 import { auth } from "@/lib/firebase";

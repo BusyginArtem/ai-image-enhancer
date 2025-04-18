@@ -9,6 +9,14 @@ export default async function SignInPage() {
   return (
     <div className="border-border mx-auto w-full max-w-sm space-y-6 rounded-sm border-2 p-8">
       <h1 className="mb-6 text-center text-2xl font-bold">Sign In</h1>
+      <div className="text-primary text-center text-base leading-5">
+        Sign in to get{" "}
+        <div className="relative inline-block text-lg leading-6 font-bold">
+          <div className="absolute bottom-1 h-1 w-full bg-chart-2 opacity-50"></div>
+          10 free
+        </div>{" "}
+        images
+      </div>
 
       <AuthProviders />
 
