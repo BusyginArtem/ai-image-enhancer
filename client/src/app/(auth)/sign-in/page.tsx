@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
-import AuthProviders from "@/components/forms/auth/providers";
+import AuthProvidersUI, { AuthProvidersSkeleton } from "@/components/forms/auth/providers";
 import SignInForm from "@/components/forms/auth/sign-in-form";
 import { Button } from "@/components/ui/button";
 import { APP_PATH } from "@/lib/constants";
@@ -14,13 +14,13 @@ export default async function SignInPage() {
         Sign in to get{" "}
         <div className="relative inline-block text-lg leading-6 font-bold">
           <div className="bg-chart-2 absolute bottom-1 h-1 w-full opacity-50"></div>
-          10 free
+          20 free
         </div>{" "}
-        images
+        credits
       </div>
 
-      <Suspense>
-        <AuthProviders />
+      <Suspense fallback={<AuthProvidersSkeleton />}>
+        <AuthProvidersUI />
       </Suspense>
 
       <div className="relative">

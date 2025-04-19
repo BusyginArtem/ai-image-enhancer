@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import authConfig from "./lib/auth.config";
 
-const protectedRoutes = ["/image-editor"];
+const protectedRoutes = ["/inpaint"];
 const authRoutes = ["/sign-in", "/sign-up"];
 
 export const { auth } = NextAuth(authConfig);
@@ -15,8 +15,10 @@ export default async function middleware(request: NextRequest) {
 
   const callbackUrl = searchParams.get("callbackUrl");
 
-  const isProtected = protectedRoutes.includes(pathname);
-  const isAuthPage = authRoutes.includes(pathname);
+  const isProtected = protectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
+  const isAuthPage = authRoutes.some((route) => pathname.startsWith(route));
 
   if (session && isAuthPage) {
     if (callbackUrl) {

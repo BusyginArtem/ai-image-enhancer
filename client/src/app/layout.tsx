@@ -1,11 +1,11 @@
 import "./globals.css";
 
 import { Metadata } from "next";
-import { ReactNode } from "react";
 import { Roboto } from "next/font/google";
+import { ReactNode } from "react";
 
-import { cn } from "@/lib/utils";
 import Providers from "@/components/providers";
+import { cn } from "@/lib/utils";
 
 const roboto = Roboto({
   weight: ["500", "700", "900"],
@@ -13,6 +13,7 @@ const roboto = Roboto({
   subsets: ["latin"],
   display: "swap",
   variable: "--roboto",
+  preload: true,
 });
 
 export const metadata: Metadata = {

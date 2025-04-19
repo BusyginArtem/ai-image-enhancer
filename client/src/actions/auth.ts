@@ -1,4 +1,4 @@
-"use server";
+("use server");
 
 import { Timestamp } from "firebase-admin/firestore";
 import { AuthError } from "next-auth";
@@ -9,9 +9,10 @@ import { signIn, signOut } from "@/lib/auth";
 import { hashPassword, verifyPasswords } from "@/lib/auth-password";
 import { AuthFormState } from "@/lib/definitions";
 import { auth } from "@/lib/firebase";
-import { adminDb } from "@/lib/firebase.admin";
 import { signInFormSchema, signUpFormSchema } from "@/lib/validation";
+import { adminDb } from "@/services/db/firebase.admin";
 import { signOut as signOutFirebase } from "firebase/auth";
+import { accountFields } from "./../lib/auth.config";
 
 export async function signInAction(_state: AuthFormState, formData: FormData) {
   const validatedFields = signInFormSchema.safeParse({
@@ -139,8 +140,8 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
       userId: userRef.id,
       provider: "credentials",
       type: "credentials",
-      subscription: "free",
       providerAccountId: userRef.id,
+      ...accountFields,
     };
 
     adminDb.collection("accounts").add(newAccount);

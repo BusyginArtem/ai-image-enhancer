@@ -1,6 +1,6 @@
+import { initFirestore } from "@auth/firebase-adapter";
 import admin, { ServiceAccount } from "firebase-admin";
 import { cert } from "firebase-admin/app";
-import { initFirestore } from "@auth/firebase-adapter";
 
 import env from "@/env";
 
@@ -22,6 +22,7 @@ if (!admin.apps.length) {
   });
 }
 
-const adminFirestoreAuth = admin.auth(app);
+const adminAuth = admin.auth(app);
 
-export { adminDb, adminFirestoreAuth };
+export { adminAuth, adminDb };
+
