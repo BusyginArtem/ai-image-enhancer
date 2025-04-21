@@ -1,4 +1,4 @@
-("use server");
+"use server";
 
 import { Timestamp } from "firebase-admin/firestore";
 import { AuthError } from "next-auth";

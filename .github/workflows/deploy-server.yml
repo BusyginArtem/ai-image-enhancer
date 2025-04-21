@@ -1,0 +1,34 @@
+name: Deploy Server & Lama Cleaner to Railway
+
+on:
+  push:
+    paths: 
+      - "server/**"
+      - ".github/workflows/deploy-server.yml"
+    branches:
+      - main
+
+jobs:
+  deploy-server:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/railwayapp/cli:3.21.0
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      SERVER_SERVICE: server
+      LAMA_CLEANER_SERVICE: lama-cleaner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy Main Server to Railway
+        run: |
+          cd server
+          railway up --service=${{ env.SERVER_SERVICE }} --verbose
+
+      - name: Deploy Lama Cleaner to Railway
+        run: |
+          cd server/lama-cleaner
+          railway up --service=${{ env.LAMA_CLEANER_SERVICE }} --verbose
