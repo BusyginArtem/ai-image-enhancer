@@ -20,11 +20,74 @@ on:
         type: boolean
 
 jobs:
-  deploy-client:
+  npm-audit-client-dependencies:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check for security issue
+        run: |
+          cd client
+          npm audit --audit-level=high
+        continue-on-error: false
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["javascript", "typescript"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: |
+          cd client
+          npm ci
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-extended
+          config-file: ./.github/codeql/codeql-config.yml
+          dependency-caching: true
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+        if: matrix.language == 'javascript' || matrix.language == 'typescript'
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: ${{ matrix.language }}
+
+  deploy-client:
+    needs: [npm-audit-client-dependencies, codeql]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
@@ -51,8 +114,8 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
   deploy-server:
-    if: ${{ inputs.deploy_server }}
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # if: ${{ inputs.deploy_server }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && inputs.deploy_server
     # if: github.event_name != 'workflow_dispatch' || inputs.deploy_server == true
     runs-on: ubuntu-latest
     container:

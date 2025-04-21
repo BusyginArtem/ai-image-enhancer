@@ -1,0 +1,14 @@
+paths:
+  - 'client/src/app/**'
+  - 'client/src/lib/**'
+  - 'client/src/components/**'
+paths-ignore:
+  - 'client/public/**'
+  - 'client/node_modules/**'
+  - 'client/.next/**'
+  - 'server/**'
+  - 'lama-cleaner/**'
+  - 'lama-cleaner-cache/**'
+queries:
+  - uses: security-and-quality
+  - uses: security-extended
