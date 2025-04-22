@@ -2,17 +2,21 @@
 
 import { Timestamp } from "firebase-admin/firestore";
 import { AuthError } from "next-auth";
-// import { signOut } from "next-auth/react";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import { signIn, signOut } from "@/lib/auth";
 import { hashPassword, verifyPasswords } from "@/lib/auth-password";
 import { AuthFormState } from "@/lib/definitions";
-import { auth } from "@/lib/firebase";
+// import { auth } from "@/lib/firebase";
+import useFirebaseClientAuth from "@/hooks/useFirebaseClientAuth";
 import { signInFormSchema, signUpFormSchema } from "@/lib/validation";
-import { adminDb } from "@/services/db/firebase.admin";
+import DbAdapter from "@/services/db/adapter";
+import FirebaseAdminService from "@/services/db/firebase-admin";
+import { AuthProviders, RawAccount, RawUser } from "@/services/types";
 import { signOut as signOutFirebase } from "firebase/auth";
 import { accountFields } from "./../lib/auth.config";
+
+const db = new DbAdapter(FirebaseAdminService);
 
 export async function signInAction(_state: AuthFormState, formData: FormData) {
   const validatedFields = signInFormSchema.safeParse({
@@ -30,21 +34,19 @@ export async function signInAction(_state: AuthFormState, formData: FormData) {
   const { email, password } = validatedFields.data;
 
   try {
-    const userSnapshot = await adminDb
-      .collection("users")
-      .where("email", "==", email)
-      .get();
+    const user = await db.getUserByEmail({ email });
 
-    if (userSnapshot.empty) {
+    if (!user) {
       return {
         success: false,
         message: "Email or password is incorrect.",
       };
     }
 
-    const user = userSnapshot.docs[0].data();
-
-    const isMatch = await verifyPasswords(password as string, user.password);
+    const isMatch = await verifyPasswords(
+      password as string,
+      user.password as string,
+    );
 
     if (!isMatch) {
       return {
@@ -112,12 +114,9 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
   }
 
   try {
-    const existingUserSnapshot = await adminDb
-      .collection("users")
-      .where("email", "==", email)
-      .get();
+    const user = await db.getUserByEmail({ email });
 
-    if (!existingUserSnapshot.empty) {
+    if (user?.id) {
       return {
         success: false,
         message:
@@ -125,7 +124,7 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
       };
     }
 
-    const newUser = {
+    const rawUser: RawUser = {
       email: email,
       password: await hashPassword(password as string),
       createdAt: Timestamp.now(),
@@ -134,23 +133,24 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
       image: null,
     };
 
-    const userRef = await adminDb.collection("users").add(newUser);
+    const userId = await db.createUser({ newUser: rawUser });
 
-    const newAccount = {
-      userId: userRef.id,
-      provider: "credentials",
-      type: "credentials",
-      providerAccountId: userRef.id,
+    if (!userId) {
+      return {
+        success: false,
+        message: "Something went wrong. Try again.",
+      };
+    }
+
+    const rawAccount: RawAccount = {
+      userId,
+      provider: AuthProviders.CREDENTIALS,
+      type: AuthProviders.CREDENTIALS,
+      providerAccountId: userId,
       ...accountFields,
     };
 
-    adminDb.collection("accounts").add(newAccount);
-
-    // await signIn("credentials", {
-    //   email: validatedFields.data.email,
-    //   password: validatedFields.data.password,
-    //   redirect: false,
-    // });
+    await db.createAccount({ newAccount: rawAccount });
 
     return {
       success: true,
@@ -172,6 +172,8 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
 
 export const signOutAction = async () => {
   try {
+    const auth = useFirebaseClientAuth();
+
     await signOut({ redirect: false });
     await signOutFirebase(auth);
   } catch (error) {

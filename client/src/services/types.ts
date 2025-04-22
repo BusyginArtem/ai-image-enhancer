@@ -1,20 +1,23 @@
-// ** Types
-// import {
+import { Account, RawAccount, RawUser, User } from "@/lib/definitions";
 
-// } from 'src/types'
+export enum AuthProviders {
+  CREDENTIALS = "credentials",
+  GITHUB = "github",
+}
+export enum AuthTypes {
+  CREDENTIALS = "credentials",
+  OAUTH = "oauth",
+}
+
+export type AuthProviderType = `${AuthProviders}`; // "credentials" | "github"
+export type AuthType = `${AuthTypes}`; // "credentials" | "oauth"
 
 export interface Service {
-  getUserByEmail: ({ email }: { email: string }) => Promise<AuthUser | null>
+  getUserByEmail: ({ email }: { email: string }) => Promise<User | null>;
+  createUser: ({ newUser }: { newUser: RawUser }) => Promise<User["id"] | null>;
+  createAccount: ({
+    newAccount,
+  }: {
+    newAccount: RawAccount;
+  }) => Promise<Account["id"] | null>;
 }
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  image: string;
-  credits: number;
-  usedCredits: number;
-  subscription: string;
-}
-
-export type AuthUser = Pick<User, "id" | "email">;

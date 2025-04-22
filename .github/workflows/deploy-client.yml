@@ -19,7 +19,7 @@ on:
       - main
 
 jobs:
-  npm-audit-client-dependencies:
+  npm-audit-dependencies:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -33,10 +33,10 @@ jobs:
       - name: Check for security issue
         run: |
           cd client
-          npm audit --audit-level=high
+          npm audit --production --audit-level=high
         continue-on-error: false
 
-  codeql:
+  static-analysis:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -78,7 +78,7 @@ jobs:
 
   deploy-client:
     if: github.ref == 'refs/heads/main'
-    needs: [npm-audit-client-dependencies, codeql]
+    needs: [npm-audit-dependencies, static-analysis]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

@@ -2,9 +2,9 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import authAdapter from "@/services/auth-adapter";
-// import { adminDb, adminFirestoreAuth } from "../services/db/firebase.admin";
 import DbAdapter from "@/services/db/adapter";
 import FirebaseAdminService from "@/services/db/firebase-admin";
+import { adminAuth } from "@/services/firebase/admin";
 import authConfig from "./auth.config";
 
 const db = new DbAdapter(FirebaseAdminService);
@@ -54,7 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           session.user.id = token.sub;
         }
 
-        const firebaseToken = await adminFirestoreAuth.createCustomToken(
+        const firebaseToken = await adminAuth.createCustomToken(
           token.sub as string,
         );
         session.firebaseToken = firebaseToken;
