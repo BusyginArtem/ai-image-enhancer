@@ -72,7 +72,7 @@ jobs:
           category: ${{ matrix.language }}
 
   deploy-server:
-    needs: [npm-audit-dependencies]
+    needs: [npm-audit-dependencies, codeql]
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/railwayapp/cli:3.21.0
