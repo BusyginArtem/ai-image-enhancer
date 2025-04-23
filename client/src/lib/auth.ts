@@ -1,12 +1,16 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-import { FirestoreAdapter } from "@auth/firebase-adapter";
+import authAdapter from "@/services/auth-adapter";
+import DbAdapter from "@/services/db/adapter";
+import FirebaseAdminService from "@/services/db/firebase-admin";
+import { adminAuth } from "@/services/firebase/admin";
 import authConfig from "./auth.config";
-import { adminDb, adminFirestoreAuth } from "./firebase.admin";
+
+const db = new DbAdapter(FirebaseAdminService);
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: FirestoreAdapter(adminDb),
+  adapter: authAdapter,
   debug: true,
   session: {
     strategy: "jwt",
@@ -50,7 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           session.user.id = token.sub;
         }
 
-        const firebaseToken = await adminFirestoreAuth.createCustomToken(
+        const firebaseToken = await adminAuth.createCustomToken(
           token.sub as string,
         );
         session.firebaseToken = firebaseToken;
@@ -75,91 +79,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        //
-
-        const userSnapshot = await adminDb
-          .collection("users")
-          .where("email", "==", credentials.email)
-          .get();
-
-        if (userSnapshot.empty) {
-          return null;
-        }
-
-        const user = userSnapshot.docs[0].data();
-
-        return {
-          id: user.id,
-          email: user.email,
-        };
+        return db.getUserByEmail({ email: credentials.email as string });
       },
     }),
   ],
 });
-
-/**
- async authorize(credentials, request) {
-  // The credentials object contains the fields defined in the credentials config
-  if (!credentials?.email || !credentials?.password) {
-    return null
-  }
-
-  try {
-    // Check if user exists in OAuth providers first
-    const oauthUser = await getDocs(
-      query(collection(db, "users"), 
-      where("email", "==", credentials.email))
-    )
-
-    if (!oauthUser.empty) {
-      // User exists in OAuth - don't allow credentials login
-      return null
-    }
-
-    // Check credentials_users collection
-    const credentialUser = await getDocs(
-      query(collection(db, "credentials_users"),
-      where("email", "==", credentials.email))
-    )
-
-    if (credentialUser.empty) {
-      // New credentials user - create account
-      const newUser = {
-        email: credentials.email,
-        password: await hashPassword(credentials.password),
-        provider: "credentials"
-      }
-
-      const userRef = await addDoc(collection(db, "credentials_users"), newUser)
-
-      return {
-        id: userRef.id,
-        email: credentials.email,
-        provider: "credentials"
-      }
-    }
-
-    // Existing credentials user - verify password
-    const user = credentialUser.docs[0].data()
-    
-    if (!user?.password) {
-      return null
-    }
-
-    const isMatch = await verifyPasswords(credentials.password, user.password)
-
-    if (!isMatch) {
-      return null
-    }
-
-    return {
-      id: credentialUser.docs[0].id, 
-      email: user.email,
-      provider: "credentials"
-    }
-
-  } catch (error) {
-    return null
-  }
-}
- */

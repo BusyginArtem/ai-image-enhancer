@@ -3,7 +3,7 @@ export default async function Dashboard() {
     <main className="container py-10 text-center lg:pt-12">
       <div className="-m-6 flex flex-wrap items-center pt-24 pb-24 md:pt-32">
         <div className="w-full p-6 lg:w-1/2">
-          <div className="lg:max-w-xl animate-slide-up [animation-delay:300ms] opacity-0">
+          <div className="lg:max-w-xl animate-slide-up opacity-0">
             <h1 className="font-roboto text-foreground mb-8 text-3xl font-bold md:text-6xl text-start">
               Discover the power of AI image inpaint
             </h1>
