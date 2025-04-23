@@ -23,7 +23,7 @@ const firebaseConfig: Config = {
   appId: env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-export default (overrideConfig: OverrideConfig = null): FirebaseApp => {
+export default function(overrideConfig: OverrideConfig = null): FirebaseApp {
   if (getApps().length && overrideConfig) {
     return initializeApp({
       ...firebaseConfig,

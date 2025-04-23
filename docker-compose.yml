@@ -9,6 +9,8 @@ services:
       - server
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000
+    env_file:
+      - client/.env.local
     #   - NODE_ENV=development
     # volumes:
     #   - ./client:/app
