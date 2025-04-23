@@ -1,14 +1,19 @@
 "use client";
 
-import { signOutAction } from "@/actions/auth";
+import { signOut as signOutFirebase } from "firebase/auth";
 import { useRouter } from "next/navigation";
+
+import { signOutAction } from "@/actions/auth";
+import useFirebaseClientAuth from "@/hooks/useFirebaseClientAuth";
 import { Button } from "../ui/button";
 
 const SignOut = () => {
   const router = useRouter();
+  const auth = useFirebaseClientAuth();
 
   const handleSignOut = async () => {
     await signOutAction();
+    await signOutFirebase(auth);
 
     router.refresh();
   };

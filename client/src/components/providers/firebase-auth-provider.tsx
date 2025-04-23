@@ -32,7 +32,7 @@ export default function FirebaseAuthProvider({
     }
 
     syncFirebaseAuth(session, auth);
-  }, [session]);
+  }, [session, auth]);
 
   return <>{children}</>;
 }

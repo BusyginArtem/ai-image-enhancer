@@ -6,14 +6,11 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import { signIn, signOut } from "@/lib/auth";
 import { hashPassword, verifyPasswords } from "@/lib/auth-password";
-import { AuthFormState } from "@/lib/definitions";
-// import { auth } from "@/lib/firebase";
-import useFirebaseClientAuth from "@/hooks/useFirebaseClientAuth";
+import { AuthFormState, RawAccount, RawUser } from "@/lib/definitions";
 import { signInFormSchema, signUpFormSchema } from "@/lib/validation";
 import DbAdapter from "@/services/db/adapter";
 import FirebaseAdminService from "@/services/db/firebase-admin";
-import { AuthProviders, RawAccount, RawUser } from "@/services/types";
-import { signOut as signOutFirebase } from "firebase/auth";
+import { AuthProviders } from "@/services/types";
 import { accountFields } from "./../lib/auth.config";
 
 const db = new DbAdapter(FirebaseAdminService);
@@ -172,10 +169,7 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
 
 export const signOutAction = async () => {
   try {
-    const auth = useFirebaseClientAuth();
-
     await signOut({ redirect: false });
-    await signOutFirebase(auth);
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
