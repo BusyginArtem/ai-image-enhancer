@@ -1,6 +1,6 @@
 import { FirebaseApp, getApp, getApps, initializeApp } from "firebase/app";
 
-import env from "@/env";
+import env from "@/env.client";
 
 type Config = {
   apiKey: string;

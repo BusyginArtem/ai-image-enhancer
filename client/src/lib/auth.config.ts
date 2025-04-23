@@ -1,8 +1,10 @@
+import 'server-only';
+
 import type { NextAuthConfig } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 
-import env from "@/env";
+import env from "@/env.server";
 
 export const accountFields = {
   credits: 20,

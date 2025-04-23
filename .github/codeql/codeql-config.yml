@@ -2,11 +2,12 @@ paths:
   - 'client/src/app/**'
   - 'client/src/lib/**'
   - 'client/src/components/**'
+  - 'server/**'
 paths-ignore:
   - 'client/public/**'
   - 'client/node_modules/**'
   - 'client/.next/**'
-  - 'server/**'
+  - 'server/venv/**'
   - 'lama-cleaner/**'
   - 'lama-cleaner-cache/**'
 queries:

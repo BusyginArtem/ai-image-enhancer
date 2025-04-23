@@ -9,7 +9,70 @@ on:
       - main
 
 jobs:
+  npm-audit-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          cd server
+          pip install -r requirements.txt
+
+      - name: Run pip-audit
+        run: |
+          cd server
+          pip install pip-audit
+          pip-audit
+        continue-on-error: false
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['python']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install server dependencies
+        run: |
+          cd server
+          pip install -r requirements.txt
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-extended
+          config-file: ./.github/codeql/codeql-config.yml
+          dependency-caching: true
+      
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: ${{ matrix.language }}
+
   deploy-server:
+    needs: [npm-audit-dependencies]
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/railwayapp/cli:3.21.0
