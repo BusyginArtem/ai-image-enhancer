@@ -1,5 +1,5 @@
 name: Deploy Next.js to Vercel
-run-name: "🚛 CD: Deploy Artifacts (${{ github.event.inputs.ref }})"
+run-name: "🚛 CD: Deploy Artifacts (${{ github.event.inputs.ref }}) to Vercel"
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

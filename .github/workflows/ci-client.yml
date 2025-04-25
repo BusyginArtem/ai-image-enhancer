@@ -1,5 +1,5 @@
-name: Lint & Build Client
-run-name: "🛠️ CI: ${{ github.event.head_commit.message }} (${{ github.sha }})"
+name: Lint & Audit & Build Client
+run-name: "🛠️ CI Client: ${{ github.event.head_commit.message }} (${{ github.sha }})"
 
 on:
   push:
@@ -78,34 +78,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # - name: Set up Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: "22"
-      #     cache: npm
-      #     cache-dependency-path: client/package-lock.json
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: client/package-lock.json
 
-      # - name: Install dependencies
-      #   run: |
-      #     cd client
-      #     npm ci
+      - name: Install dependencies
+        run: |
+          cd client
+          npm ci
 
-      # - name: Initialize CodeQL
-      #   uses: github/codeql-action/init@v3
-      #   with:
-      #     languages: ${{ matrix.language }}
-      #     queries: +security-extended
-      #     config-file: ./.github/codeql/codeql-config.yml
-      #     dependency-caching: true
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-extended
+          config-file: ./.github/codeql/codeql-config.yml
+          dependency-caching: true
 
-      # - name: Autobuild
-      #   uses: github/codeql-action/autobuild@v3
-      #   if: matrix.language == 'typescript'
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+        if: matrix.language == 'typescript'
 
-      # - name: Perform CodeQL Analysis
-      #   uses: github/codeql-action/analyze@v3
-      #   with:
-      #     category: ${{ matrix.language }}
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: ${{ matrix.language }}
 
   build:
     needs: [lint, npm-audit-dependencies, static-analysis]
@@ -150,14 +150,6 @@ jobs:
           NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
           NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
           EOF
-
-      - name: Debug environment variables
-        run: |
-          cd client
-          echo "AUTH_FIREBASE_PRIVATE_KEY length: $(echo -n '${{ secrets.AUTH_FIREBASE_PRIVATE_KEY }}' | wc -c)"
-          echo "AUTH_FIREBASE_PRIVATE_KEY first 20 chars: $(echo -n '${{ secrets.AUTH_FIREBASE_PRIVATE_KEY }}' | head -c 20)"
-        env:
-          AUTH_FIREBASE_PRIVATE_KEY: ${{ secrets.AUTH_FIREBASE_PRIVATE_KEY }}
 
       - name: Install dependencies
         run: |
