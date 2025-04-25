@@ -29,7 +29,9 @@ jobs:
         python-version: "3.10"
 
     - name: Install requirements
-      run: pip install --quiet --requirement requirements.txt
+      run: |
+        cd server
+        pip install -r requirements.txt
 
     - name: Lint code
       run: |
@@ -77,7 +79,7 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install server dependencies
+      - name: Install dependencies
         run: |
           cd server
           pip install -r requirements.txt
