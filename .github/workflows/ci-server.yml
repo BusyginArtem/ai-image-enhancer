@@ -49,8 +49,13 @@ jobs:
 
     - name: Lint code
       run: |
-        flake8 --ignore=E501,E231 *.py
-        pylint --disable=C0301 --disable=C0326 *.py
+        cd server
+        if ls *.py >/dev/null 2>&1; then
+          flake8 --ignore=E501,E231 *.py
+          pylint --disable=C0301,C0326 *.py
+        else
+          echo "No Python files found in server directory, skipping linting"
+        fi
 
   npm-audit-dependencies:
     runs-on: ubuntu-latest

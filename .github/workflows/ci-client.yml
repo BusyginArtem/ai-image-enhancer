@@ -32,11 +32,16 @@ jobs:
           cache-dependency-path: client/package-lock.json
 
       - name: Cache node_modules
+        id: cache-node-modules
         uses: actions/cache@v4
         with:
           path: client/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
+
+      - name: Log cache status
+        run: |
+          echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
 
       - name: Install dependencies
         run: |
@@ -64,11 +69,16 @@ jobs:
           cache-dependency-path: client/package-lock.json
 
       - name: Cache node_modules
+        id: cache-node-modules
         uses: actions/cache@v4
         with:
           path: client/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
+
+      - name: Log cache status
+        run: |
+          echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
 
       - name: Audit dependencies
         run: |
@@ -94,11 +104,16 @@ jobs:
           cache-dependency-path: client/package-lock.json
 
       - name: Cache node_modules
+        id: cache-node-modules
         uses: actions/cache@v4
         with:
           path: client/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
+
+      - name: Log cache status
+        run: |
+          echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
 
       - name: Install dependencies
         run: |
@@ -137,11 +152,16 @@ jobs:
           cache-dependency-path: client/package-lock.json
 
       - name: Cache node_modules
+        id: cache-node-modules
         uses: actions/cache@v4
         with:
           path: client/node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
+
+      - name: Log cache status
+        run: |
+          echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
 
       - name: Restore Next.js cache
         uses: actions/cache@v4
