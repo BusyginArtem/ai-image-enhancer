@@ -6,14 +6,12 @@ on:
     paths:
       - "client/**"
       - ".github/workflows/ci-client.yml"
-      - "client/.env.local"
     branches: 
       - main
   pull_request:
     paths:
       - "client/**"
       - ".github/workflows/ci-client.yml"
-      - "client/.env.local"
     branches:
       - main
   workflow_dispatch:
@@ -33,6 +31,13 @@ jobs:
           cache: npm
           cache-dependency-path: client/package-lock.json
 
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
       - name: Install dependencies
         run: |
           cd client
@@ -45,7 +50,7 @@ jobs:
         continue-on-error: false
 
   npm-audit-dependencies:
-    name: 🛡️ Audit Frontend Packages for Security Vulnerabilities
+    name: 🛡️ Audit Frontend Packages
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -58,22 +63,25 @@ jobs:
           cache: npm
           cache-dependency-path: client/package-lock.json
 
-      - name: Check for security issue
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Audit dependencies
         run: |
           cd client
           npm audit --production --audit-level=high
         continue-on-error: false
 
   static-analysis:
-    name: 🔬 Run Static Analysis on Frontend Code
+    name: 🔬 Static Analysis (TypeScript)
     runs-on: ubuntu-latest
     permissions:
       security-events: write
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        language: ["typescript"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -84,6 +92,13 @@ jobs:
           node-version: "22"
           cache: npm
           cache-dependency-path: client/package-lock.json
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: |
@@ -93,26 +108,25 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: ${{ matrix.language }}
+          languages: typescript
           queries: +security-extended
           config-file: ./.github/codeql/codeql-config.yml
           dependency-caching: true
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
-        if: matrix.language == 'typescript'
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: ${{ matrix.language }}
+          category: typescript
 
   build:
     needs: [lint, npm-audit-dependencies, static-analysis]
     name: 🏗️ Build Frontend
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -122,14 +136,21 @@ jobs:
           cache: npm
           cache-dependency-path: client/package-lock.json
 
-      - name: Restore cache
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+
+      - name: Restore Next.js cache
         uses: actions/cache@v4
         with:
           path: |
-            .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json', 'client/yarn.lock') }}-${{ hashFiles('client/**.[jt]s', 'client/**.[jt]sx') }}
+            client/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json') }}-${{ hashFiles('client/**.[jt]s', 'client/**.[jt]sx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json', 'client/yarn.lock') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json') }}-
 
       - name: Create client/.env.local
         run: |
