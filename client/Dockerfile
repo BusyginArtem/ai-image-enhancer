@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:lts-slim AS builder
 
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -8,7 +8,7 @@ COPY . ./
 RUN npm run build
 
 # Use lightweight image for production
-FROM node:18-alpine AS runner
+FROM node:lts-slim AS runner
 WORKDIR /app
 
 
