@@ -2,13 +2,15 @@ name: Lint & Build Client
 run-name: "🛠️ CI: ${{ github.event.head_commit.message }} (${{ github.sha }})"
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
   pull_request:
+    paths:
+      - "client/**"
+      - ".github/workflows/ci-client.yml"
+      - "client/.env.local"
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -65,7 +67,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript", "typescript"]
+        language: ["typescript"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -76,13 +78,6 @@ jobs:
           node-version: "22"
           cache: npm
           cache-dependency-path: client/package-lock.json
-
-      # - name: Cache Node Modules
-      #   id: cache-node-modules
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: node_modules
-      #     key: client-node-modules-${{ hashFiles('client/package-lock.json') }}
 
       - name: Install dependencies
         # if: steps.cache-node-modules.outputs.cache-hit != 'true'
@@ -100,7 +95,7 @@ jobs:
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
-        if: matrix.language == 'javascript' || matrix.language == 'typescript'
+        if: matrix.language == 'typescript'
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
@@ -127,9 +122,27 @@ jobs:
         with:
           path: |
             .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json', 'client/yarn.lock') }}-${{ hashFiles('client/**.[jt]s', 'client/**.[jt]sx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json', 'client/yarn.lock') }}-
+
+      - name: Create client/.env.local
+        run: |
+          echo "NEXT_PUBLIC_API_URL=http://localhost:8000" >> client/.env.local
+          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> client/.env.local
+          echo "AUTH_FIREBASE_CLIENT_EMAIL=${{ secrets.AUTH_FIREBASE_CLIENT_EMAIL }}" >> client/.env.local
+          echo "AUTH_FIREBASE_PRIVATE_KEY=${{ secrets.AUTH_FIREBASE_PRIVATE_KEY }}" >> client/.env.local
+          echo "AUTH_GITHUB_SECRET=${{ secrets.AUTH_GITHUB_SECRET }}" >> client/.env.local
+          echo "AUTH_GITHUB_ID=${{ secrets.AUTH_GITHUB_ID }}" >> client/.env.local
+          echo "AUTH_FIREBASE_PROJECT_ID=${{ secrets.AUTH_FIREBASE_PROJECT_ID }}" >> client/.env.local
+          echo "AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}" >> client/.env.local
+          echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" >> client/.env.local
+          echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}" >> client/.env.local
+          echo "NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" >> client/.env.local
+          echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}" >> client/.env.local
+          echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}" >> client/.env.local
+          echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}" >> client/.env.local
+          echo "NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" >> client/.env.local
 
       - name: Install dependencies
         run: |
