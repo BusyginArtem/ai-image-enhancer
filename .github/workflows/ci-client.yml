@@ -133,21 +133,31 @@ jobs:
 
       - name: Create client/.env.local
         run: |
-          echo "NEXT_PUBLIC_API_URL=http://localhost:8000" >> client/.env.local
-          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> client/.env.local
-          echo "AUTH_FIREBASE_CLIENT_EMAIL=${{ secrets.AUTH_FIREBASE_CLIENT_EMAIL }}" >> client/.env.local
-          echo "AUTH_FIREBASE_PRIVATE_KEY=${{ secrets.AUTH_FIREBASE_PRIVATE_KEY }}" >> client/.env.local
-          echo "AUTH_GITHUB_SECRET=${{ secrets.AUTH_GITHUB_SECRET }}" >> client/.env.local
-          echo "AUTH_GITHUB_ID=${{ secrets.AUTH_GITHUB_ID }}" >> client/.env.local
-          echo "AUTH_FIREBASE_PROJECT_ID=${{ secrets.AUTH_FIREBASE_PROJECT_ID }}" >> client/.env.local
-          echo "AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}" >> client/.env.local
-          echo "AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}" >> client/.env.local
-          echo "NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}" >> client/.env.local
-          echo "NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" >> client/.env.local
-          echo "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}" >> client/.env.local
-          echo "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}" >> client/.env.local
-          echo "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}" >> client/.env.local
-          echo "NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" >> client/.env.local
+          cat << 'EOF' > client/.env.local
+          NEXT_PUBLIC_API_URL=http://localhost:8000
+          AUTH_SECRET=${{ secrets.AUTH_SECRET }}
+          AUTH_FIREBASE_CLIENT_EMAIL=${{ secrets.AUTH_FIREBASE_CLIENT_EMAIL }}
+          AUTH_FIREBASE_PRIVATE_KEY=${{ secrets.AUTH_FIREBASE_PRIVATE_KEY }}
+          AUTH_GITHUB_SECRET=${{ secrets.AUTH_GITHUB_SECRET }}
+          AUTH_GITHUB_ID=${{ secrets.AUTH_GITHUB_ID }}
+          AUTH_FIREBASE_PROJECT_ID=${{ secrets.AUTH_FIREBASE_PROJECT_ID }}
+          AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}
+          AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          EOF
+
+      - name: Debug environment variables
+        run: |
+          cd client
+          echo "AUTH_FIREBASE_PRIVATE_KEY length: $(echo -n '${{ secrets.AUTH_FIREBASE_PRIVATE_KEY }}' | wc -c)"
+          echo "AUTH_FIREBASE_PRIVATE_KEY first 20 chars: $(echo -n '${{ secrets.AUTH_FIREBASE_PRIVATE_KEY }}' | head -c 20)"
+        env:
+          AUTH_FIREBASE_PRIVATE_KEY: ${{ secrets.AUTH_FIREBASE_PRIVATE_KEY }}
 
       - name: Install dependencies
         run: |
