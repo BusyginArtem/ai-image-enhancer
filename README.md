@@ -1,6 +1,6 @@
 # AI Image Enhancer
 
-## Build Status Badge: ![](https://github.com/BusyginArtem/ai-image-enhancer/workflows/deploy-client/badge.svg)
+## Build Status Badge: ![](https://github.com/BusyginArtem/ai-image-enhancer/actions/workflows/deploy-client/badge.svg)
 
 AI Image Enhancer is a monorepo project featuring a Next.js frontend for a user-friendly interface and a backend powered by a Python FastAPI server and Lama Cleaner for AI-driven image enhancement. The frontend is deployed on Vercel, while the backend services run on Railway.
 
