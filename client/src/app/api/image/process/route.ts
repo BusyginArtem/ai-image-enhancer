@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   //   const arrayBuffer = await file.arrayBuffer();
   //   const buffer = Buffer.from(arrayBuffer);
 
-  //   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/process`, {
+  //   const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_API_URL}/process`, {
   //     method: "POST",
   //     headers: { "Content-Type": "application/octet-stream" },
   //     body: buffer,

@@ -9,7 +9,7 @@ import { Slider } from "../ui/slider";
 import Canvas from "./canvas";
 import FileUploader from "./uploader";
 
-const apiUrl = clientEnv.NEXT_PUBLIC_API_URL
+const apiUrl = clientEnv.NEXT_PUBLIC_SERVER_API_URL
 const DEFAULT_IMAGE_WIDTH = 600;
 
 export default function CanvasEditor() {
