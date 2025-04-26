@@ -63,10 +63,10 @@ async def process_image(
         mask_data = await mask.read()
         mask_buffer = BytesIO(mask_data)
 
-        files = {
-            "image": (os.path.basename(image_path), open(image_path, "rb"), "image/png"),
-            "mask": (mask.filename, mask_buffer, "image/png"),
-        }
+        files = {}
+        with open(image_path, "rb") as image_file:
+            files["image"] = (os.path.basename(image_path), image_file, "image/png")
+        files["mask"] = (mask.filename, mask_buffer, "image/png")
 
         data = {
             "ldmSteps": "25",
