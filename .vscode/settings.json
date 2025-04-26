@@ -3,5 +3,6 @@
   "python.analysis.typeCheckingMode": "basic",
   "editor.codeActionsOnSave": {
     "source.organizeImports": "always"
-  }
+  },
+  "flake8.args": ["--ignore=E501,E231", "--max-line-length=88"]
 }

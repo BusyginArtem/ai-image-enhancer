@@ -13,7 +13,7 @@ LAMA_CLEANER_URL = os.getenv("LAMA_CLEANER_URL", "http://lama-cleaner:8080/inpai
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "https://ai-image-enhancer-ashen.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,14 +25,17 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
 @app.get("/")
 def root():
+    """Test the server."""
     return {"message": "Hello World"}
+
 
 @app.post("/upload")
 def upload_image(file: UploadFile = File(...)):
     """Uploading the image to the server."""
-    try:        
+    try:
         filename = file.filename if file.filename else "default_filename"
         file_path = os.path.join(UPLOAD_FOLDER, os.path.basename(filename))
 
@@ -40,7 +43,8 @@ def upload_image(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
         return {"filename": file.filename, "path": str(file_path)}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}") from e
+
 
 @app.post("/process")
 async def process_image(
@@ -87,7 +91,7 @@ async def process_image(
         # Ensure the image file exists
         if not os.path.exists(image_path):
             raise HTTPException(status_code=404, detail="Image file not found.")
-        
+
         # Read mask into memory instead of saving to disk
         mask_data = await mask.read()
         mask_buffer = BytesIO(mask_data)
@@ -96,7 +100,7 @@ async def process_image(
             "image": (os.path.basename(image_path), open(image_path, "rb"), "image/png"),
             "mask": (mask.filename, mask_buffer, "image/png"),
         }
-        
+
         data = {
             "ldmSteps": str(ldmSteps),
             "ldmSampler": ldmSampler,
@@ -134,12 +138,12 @@ async def process_image(
             "controlnet_conditioning_scale": str(controlnet_conditioning_scale),
             "controlnet_method": controlnet_method,
         }
-        
-        response = requests.post(LAMA_CLEANER_URL, files=files, data=data)
-        
+
+        response = requests.post(LAMA_CLEANER_URL, files=files, data=data, timeout=30)
+
         mask_buffer.close()
         os.remove(image_path)
-        
+
         if response.status_code == 200:
             return Response(content=response.content, media_type="image/png")
         else:
@@ -147,4 +151,4 @@ async def process_image(
     except Exception as e:
         if os.path.exists(image_path):
             os.remove(image_path)
-        raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}") from e

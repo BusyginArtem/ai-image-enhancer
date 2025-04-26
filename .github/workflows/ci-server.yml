@@ -40,12 +40,7 @@ jobs:
       run: |
         cd server
         pip install -r requirements.txt
-        pip install flake8 pylint  # Add this to ensure flake8 and pylint are installed
-
-    - name: List server directory contents
-      run: |
-        cd server
-        ls -la
+        pip install flake8 pylint
 
     - name: Lint code
       run: |
