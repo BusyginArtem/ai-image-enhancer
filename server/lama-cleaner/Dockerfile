@@ -9,8 +9,6 @@ RUN apt-get update && apt-get install -y \
     libpng16-16 \
     && rm -rf /var/lib/apt/lists/*
 
-# RUN pip install --no-cache-dir lama-cleaner
-# RUN pip install --no-cache-dir "huggingface_hub==0.14.1"
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
