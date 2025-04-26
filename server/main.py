@@ -70,6 +70,10 @@ async def process_image(
         # Ensure the image file exists
         image_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, image_unique_name))
 
+        # Ensure the path is within the UPLOAD_FOLDER
+        if not image_path.startswith(os.path.abspath(UPLOAD_FOLDER)):
+            raise HTTPException(status_code=400, detail="Invalid file path.")
+
         if not os.path.exists(image_path):
             raise HTTPException(status_code=404, detail="Image file not found.")
 
@@ -78,8 +82,8 @@ async def process_image(
         mask_buffer = BytesIO(mask_data)
 
         files = {}
-        with open(image_path, "rb") as image_file:
-            files["image"] = (os.path.basename(image_path), image_file, "image/png")
+        image_file = open(image_path, "rb")
+        files["image"] = (os.path.basename(image_path), image_file, "image/png")
         files["mask"] = (mask.filename, mask_buffer, "image/png")
 
         data = {
@@ -121,14 +125,21 @@ async def process_image(
 
         response = requests.post(f"{LAMA_CLEANER_URL}/inpaint", files=files, data=data, timeout=30)
 
+        image_file.close()
         mask_buffer.close()
-        os.remove(image_path)
+
+        if os.path.exists(image_path):
+            os.remove(image_path)
 
         if response.status_code == 200:
             return Response(content=response.content, media_type="image/png")
-
         raise HTTPException(status_code=500, detail=f"Processing failed: {response.text}")
     except Exception as e:
+        if 'image_file' in locals():
+            image_file.close()
+        if 'mask_buffer' in locals():
+            mask_buffer.close()
+
         if os.path.exists(image_path):
             os.remove(image_path)
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}") from e

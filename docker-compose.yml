@@ -11,7 +11,6 @@ services:
       - NEXT_PUBLIC_SERVER_API_URL=http://localhost:8000
     env_file:
       - client/.env.local
-    #   - NODE_ENV=development
     # volumes:
     #   - ./client:/app
     #   - /app/node_modules    
@@ -28,7 +27,7 @@ services:
     volumes:
       - ./server/uploads:/app/uploads
     environment:
-      - LAMA_CLEANER_URL=http://lama-cleaner:8080/inpaint
+      - LAMA_CLEANER_URL=http://lama-cleaner:8080
 
   lama-cleaner:
     build:
