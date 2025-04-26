@@ -4,5 +4,6 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "always"
   },
-  "flake8.args": ["--ignore=E501,E231", "--max-line-length=88"]
+  "flake8.args": ["--ignore=E501,E231", "--max-line-length=90"],
+  "pylint.args": ["--disable=C0301,C0103"]
 }

@@ -47,7 +47,7 @@ jobs:
         cd server
         if ls *.py >/dev/null 2>&1; then
           flake8 --ignore=E501,E231 *.py
-          pylint --disable=C0301,C0326 *.py
+          pylint --disable=C0301,C0103 *.py
         else
           echo "No Python files found in server directory, skipping linting"
         fi

@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { Download, Eye, Image as ImageIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
+import clientEnv from "@/env.client";
+import { cn } from "@/lib/utils";
+import { Slider } from "../ui/slider";
 import Canvas from "./canvas";
 import FileUploader from "./uploader";
-import { Slider } from "../ui/slider";
-import { cn } from "@/lib/utils";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const apiUrl = clientEnv.NEXT_PUBLIC_API_URL
 const DEFAULT_IMAGE_WIDTH = 600;
 
 export default function CanvasEditor() {
@@ -89,7 +90,7 @@ export default function CanvasEditor() {
     formData.append("file", fileToUpload);
 
     try {
-      const response = await fetch(`${apiUrl}/upload`, {
+      const response = await fetch(`${apiUrl}/inpaint/upload`, {
         method: "POST",
         body: formData,
       });
@@ -144,7 +145,7 @@ export default function CanvasEditor() {
 
           formData.append("image_path", uploadedImagePath);
 
-          const response = await fetch(`${apiUrl}/process`, {
+          const response = await fetch(`${apiUrl}/inpaint/process`, {
             method: "POST",
             body: formData,
           });
