@@ -5,7 +5,7 @@ interface ClientEnv {
   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: string;
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: string;
   NEXT_PUBLIC_FIREBASE_APP_ID: string;
-  NEXT_PUBLIC_API_URL: string;
+  NEXT_PUBLIC_SERVER_API_URL: string;
 }
 
 const clientEnv: ClientEnv = {
@@ -21,7 +21,7 @@ const clientEnv: ClientEnv = {
     .NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID as string,
   NEXT_PUBLIC_FIREBASE_APP_ID: process.env
     .NEXT_PUBLIC_FIREBASE_APP_ID as string,
-  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL as string,
+  NEXT_PUBLIC_SERVER_API_URL: process.env.NEXT_PUBLIC_SERVER_API_URL as string,
 };
 
 if (
@@ -31,7 +31,7 @@ if (
   !clientEnv.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
   !clientEnv.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ||
   !clientEnv.NEXT_PUBLIC_FIREBASE_APP_ID ||
-  !clientEnv.NEXT_PUBLIC_API_URL
+  !clientEnv.NEXT_PUBLIC_SERVER_API_URL
 ) {
   throw new Error("Missing client-side environment variables");
 }

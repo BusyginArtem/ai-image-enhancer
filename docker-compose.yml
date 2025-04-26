@@ -8,7 +8,7 @@ services:
     depends_on:
       - server
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_SERVER_API_URL=http://localhost:8000
     env_file:
       - client/.env.local
     #   - NODE_ENV=development
