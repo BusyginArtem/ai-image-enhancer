@@ -28,7 +28,7 @@ export default function CanvasEditor() {
   }>({ width: 0, height: 0 });
 
   const containerRef = useRef<HTMLDivElement>(null);
-
+console.log('%c apiUrl', 'color: green; font-weight: bold;', apiUrl)
   const handleWheel = (e: WheelEvent) => {
     e.preventDefault();
 
