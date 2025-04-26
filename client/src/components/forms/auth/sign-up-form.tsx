@@ -92,7 +92,7 @@ export default function SignUpForm() {
         Sign Up
       </Button>
 
-      <span className="inline-block h-4 w-full text-sm text-red-400">
+      <span className="inline-block h-4 w-full text-sm text-red-500">
         {!formState?.success ? formState?.message : ""}
       </span>
     </form>
