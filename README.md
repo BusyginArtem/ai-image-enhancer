@@ -1,6 +1,6 @@
 # AI Image Enhancer
 
-## Build Status Badge: [![Deploy Next.js to Vercel](https://github.com/BusyginArtem/ai-image-enhancer/actions/workflows/deploy-client.yml/badge.svg?branch=main&event=push)](https://github.com/BusyginArtem/ai-image-enhancer/actions/workflows/deploy-client.yml) | [![Deploy Server & Lama Cleaner to Railway](https://github.com/BusyginArtem/ai-image-enhancer/actions/workflows/deploy-server.yml/badge.svg?branch=main&event=push)](https://github.com/BusyginArtem/ai-image-enhancer/actions/workflows/deploy-server.yml)
+## Build Status Badge: [![Deploy Next.js to Vercel](https://github.com/BusyginArtem/ai-image-enhancer/actions/workflows/cd-client.yml/badge.svg?branch=main&event=push)](https://github.com/BusyginArtem/ai-image-enhancer/actions/workflows/cd-client.yml) | [![Deploy Server & Lama Cleaner to Railway](https://github.com/BusyginArtem/ai-image-enhancer/actions/workflows/cd-server.yml/badge.svg?branch=main&event=push)](https://github.com/BusyginArtem/ai-image-enhancer/actions/workflows/cd-server.yml)
 
 AI Image Enhancer is a monorepo project featuring a Next.js frontend for a user-friendly interface and a backend powered by a Python FastAPI server and Lama Cleaner for AI-driven image enhancement. The frontend is deployed on Vercel, while the backend services run on Railway.
 
