@@ -1,0 +1,144 @@
+name: Lint & Audit Server
+run-name: "🛠️ CI Server: ${{ github.event.head_commit.message }} (${{ github.sha }})"
+
+on:
+  push:
+    paths:
+      - "server/**"
+      - ".github/workflows/ci-server.yml"
+    branches: 
+      - main
+  pull_request:
+    paths:
+      - "server/**"
+      - ".github/workflows/ci-server.yml"
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Python environment
+      uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "3.10"
+
+    - name: Cache Python dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('server/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install requirements
+      run: |
+        cd server
+        pip install -r requirements.txt
+        pip install flake8 pylint
+
+    - name: Lint code
+      run: |
+        cd server
+        if ls *.py >/dev/null 2>&1; then
+          flake8 --ignore=E501,E231 *.py
+          pylint --disable=C0301,C0103 *.py
+        else
+          echo "No Python files found in server directory, skipping linting"
+        fi
+
+  npm-audit-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('server/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          cd server
+          pip install -r requirements.txt
+
+      - name: Run pip-audit
+        run: |
+          cd server
+          pip install pip-audit
+          pip-audit
+        continue-on-error: false
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['python']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('server/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          cd server
+          pip install -r requirements.txt
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-extended
+          config-file: ./.github/codeql/codeql-config.yml
+          dependency-caching: true
+      
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: ${{ matrix.language }}
+
+  trigger-deploy:
+    name: 🚚 Start Server Deployment
+    if: github.ref == 'refs/heads/main'
+    needs: [lint, npm-audit-dependencies, codeql]
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Dispatch
+        uses: benc-uk/workflow-dispatch@v1.2.4
+        with:
+          workflow: Deploy Server & Lama Cleaner to Railway
+          inputs: '{ "ref": "${{ github.sha }}" }'

@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { Download, Eye, Image as ImageIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
+import clientEnv from "@/env.client";
+import { cn } from "@/lib/utils";
+import { Slider } from "../ui/slider";
 import Canvas from "./canvas";
 import FileUploader from "./uploader";
-import { Slider } from "../ui/slider";
-import { cn } from "@/lib/utils";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const apiUrl = clientEnv.NEXT_PUBLIC_API_URL
 const DEFAULT_IMAGE_WIDTH = 600;
 
 export default function CanvasEditor() {
@@ -81,7 +82,7 @@ export default function CanvasEditor() {
     reader.readAsDataURL(file);
   };
 
-  const uploadImage = async (fileToUpload: File) => {
+  const uploadImage = async (fileToUpload: File): Promise<string | null> => {
     if (!originalImageFile) return null;
 
     const formData = new FormData();
@@ -89,14 +90,14 @@ export default function CanvasEditor() {
     formData.append("file", fileToUpload);
 
     try {
-      const response = await fetch(`${apiUrl}/upload`, {
+      const response = await fetch(`${apiUrl}/inpaint/upload`, {
         method: "POST",
         body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
-        return data.path;
+        return data.filename;
       } else {
         console.error("Image upload failed.");
         return null;
@@ -120,7 +121,7 @@ export default function CanvasEditor() {
           const formData = new FormData();
           formData.append("mask", blob, "mask.png");
 
-          let uploadedImagePath: string | null;
+          let uploadedImageName: string | null;
 
           if (editedImage && originalImageFile) {
             const response = await fetch(editedImage);
@@ -133,18 +134,18 @@ export default function CanvasEditor() {
                 lastModified: Date.now(),
               },
             );
-            uploadedImagePath = await uploadImage(imageFileFromBlob);
+            uploadedImageName = await uploadImage(imageFileFromBlob);
           } else if (originalImageFile) {
-            uploadedImagePath = await uploadImage(originalImageFile);
+            uploadedImageName = await uploadImage(originalImageFile);
           } else {
             throw new Error("No image available to process");
           }
 
-          if (!uploadedImagePath) return;
+          if (!uploadedImageName) return;
 
-          formData.append("image_path", uploadedImagePath);
+          formData.append("image_unique_name", uploadedImageName);
 
-          const response = await fetch(`${apiUrl}/process`, {
+          const response = await fetch(`${apiUrl}/inpaint/process`, {
             method: "POST",
             body: formData,
           });

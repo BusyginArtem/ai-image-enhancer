@@ -29,7 +29,7 @@ export default function FileUploader({
       <input
         id="picture"
         type="file"
-        accept="image/*"
+        accept="image/png,image/jpeg"
         onChange={handleFileChange}
         className="absolute inset-0 z-[1] h-full w-full cursor-pointer opacity-0"
       />
