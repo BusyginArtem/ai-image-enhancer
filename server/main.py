@@ -68,7 +68,7 @@ async def process_image(
     """Processes the image using Lama Cleaner."""
     try:
         # Ensure the image file exists
-        image_path = os.path.join(UPLOAD_FOLDER, image_unique_name)
+        image_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, image_unique_name))
 
         if not os.path.exists(image_path):
             raise HTTPException(status_code=404, detail="Image file not found.")
