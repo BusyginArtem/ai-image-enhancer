@@ -70,6 +70,10 @@ async def process_image(
         # Ensure the image file exists
         image_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, image_unique_name))
 
+        # Ensure the path is within the UPLOAD_FOLDER
+        if not image_path.startswith(os.path.abspath(UPLOAD_FOLDER)):
+            raise HTTPException(status_code=400, detail="Invalid file path.")
+
         if not os.path.exists(image_path):
             raise HTTPException(status_code=404, detail="Image file not found.")
 
