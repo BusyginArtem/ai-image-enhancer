@@ -2,6 +2,7 @@
 import os
 from io import BytesIO
 import shutil
+import uuid
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,25 +38,38 @@ def root():
 @app.post("/inpaint/upload")
 def upload_image(file: UploadFile = File(...)):
     """Uploading the image to the server."""
+
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Filename is required")
+
+    file_extension = os.path.splitext(file.filename)[1].lower()
+    allowed_extensions = {".png", ".jpg", ".jpeg"}
+
+    if file_extension not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="Unsupported file type")
+
     try:
         filename = file.filename if file.filename else "default_filename"
-        file_path = os.path.join(UPLOAD_FOLDER, os.path.basename(filename))
+        unique_filename = f"{filename}-{uuid.uuid4()}"
+        file_path = os.path.join(UPLOAD_FOLDER, os.path.basename(unique_filename))
 
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-        return {"filename": file.filename, "path": str(file_path)}
+        return {"filename": unique_filename}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}") from e
 
 
 @app.post("/inpaint/process")
 async def process_image(
-    image_path: str = Form(...),
+    image_unique_name: str = Form(...),
     mask: UploadFile = File(...),
 ):
     """Processes the image using Lama Cleaner."""
     try:
         # Ensure the image file exists
+        image_path = os.path.join(UPLOAD_FOLDER, image_unique_name)
+
         if not os.path.exists(image_path):
             raise HTTPException(status_code=404, detail="Image file not found.")
 

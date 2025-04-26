@@ -82,7 +82,7 @@ export default function CanvasEditor() {
     reader.readAsDataURL(file);
   };
 
-  const uploadImage = async (fileToUpload: File) => {
+  const uploadImage = async (fileToUpload: File): Promise<string | null> => {
     if (!originalImageFile) return null;
 
     const formData = new FormData();
@@ -97,7 +97,7 @@ export default function CanvasEditor() {
 
       if (response.ok) {
         const data = await response.json();
-        return data.path;
+        return data.filename;
       } else {
         console.error("Image upload failed.");
         return null;
@@ -121,7 +121,7 @@ export default function CanvasEditor() {
           const formData = new FormData();
           formData.append("mask", blob, "mask.png");
 
-          let uploadedImagePath: string | null;
+          let uploadedImageName: string | null;
 
           if (editedImage && originalImageFile) {
             const response = await fetch(editedImage);
@@ -134,16 +134,16 @@ export default function CanvasEditor() {
                 lastModified: Date.now(),
               },
             );
-            uploadedImagePath = await uploadImage(imageFileFromBlob);
+            uploadedImageName = await uploadImage(imageFileFromBlob);
           } else if (originalImageFile) {
-            uploadedImagePath = await uploadImage(originalImageFile);
+            uploadedImageName = await uploadImage(originalImageFile);
           } else {
             throw new Error("No image available to process");
           }
 
-          if (!uploadedImagePath) return;
+          if (!uploadedImageName) return;
 
-          formData.append("image_path", uploadedImagePath);
+          formData.append("image_unique_name", uploadedImageName);
 
           const response = await fetch(`${apiUrl}/inpaint/process`, {
             method: "POST",
