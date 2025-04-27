@@ -7,6 +7,10 @@ on:
       ref:
         required: true
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy-server:
     runs-on: ubuntu-latest
@@ -16,8 +20,6 @@ jobs:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-      SERVER_SERVICE: server
-      LAMA_CLEANER_SERVICE: lama-cleaner
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,9 +27,9 @@ jobs:
       - name: Deploy Main Server to Railway
         run: |
           cd server
-          railway up --service=${{ env.SERVER_SERVICE }} --verbose
+          railway up --service=${{ vars.RAILWAY_SERVER_SERVICE_NAME }} --verbose
 
       - name: Deploy Lama Cleaner to Railway
         run: |
           cd server/lama-cleaner
-          railway up --service=${{ env.LAMA_CLEANER_SERVICE }} --verbose
+          railway up --service=${{ vars.RAILWAY_LAMA_CLEANER_SERVICE_NAME }} --verbose
