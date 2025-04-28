@@ -8,7 +8,7 @@ type Props = {
   brushSize: number;
   zoomLevel: number;
   disabled: boolean;
-  handleProcessImage: (mask: HTMLCanvasElement) => Promise<void>;
+  onProcessImage: (mask: HTMLCanvasElement) => Promise<void>;
 };
 
 export default function Canvas({
@@ -16,7 +16,7 @@ export default function Canvas({
   brushSize,
   zoomLevel,
   disabled,
-  handleProcessImage,
+  onProcessImage,
 }: Props) {
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDrawn, setIsDrawn] = useState(false);
@@ -141,7 +141,7 @@ export default function Canvas({
 
     if (!drawingCanvasRef.current || disabled || !isDrawn) return;
     try {
-      await handleProcessImage(drawingCanvasRef.current);
+      await onProcessImage(drawingCanvasRef.current);
       setIsDrawn(false);
       clearCanvas();
     } catch (error) {

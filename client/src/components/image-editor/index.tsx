@@ -1,20 +1,23 @@
 "use client";
 
-import { Download, Eye, Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import clientEnv from "@/env.client";
 import { cn } from "@/lib/utils";
 import { Slider } from "../ui/slider";
 import Canvas from "./canvas";
+import Controls from "./controls";
 import FileUploader from "./uploader";
 
-const apiUrl = clientEnv.NEXT_PUBLIC_SERVER_API_URL
+const apiUrl = clientEnv.NEXT_PUBLIC_SERVER_API_URL;
 const DEFAULT_IMAGE_WIDTH = 600;
 
 export default function CanvasEditor() {
-  const [editedImage, setEditedImage] = useState<string | null>(null);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  // const [editedImage, setEditedImage] = useState<string | null>(null);
+  const [editedImages, setEditedImages] = useState<string[]>([]);
+  const [editedImageIndex, setEditedImageIndex] = useState(-1);
+  // const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [originalImageFile, setOriginalImageFile] = useState<File | null>(null);
   const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
 
@@ -51,7 +54,8 @@ export default function CanvasEditor() {
         container.removeEventListener("wheel", handleWheel);
       };
     }
-  }, [uploadedImage, dimensions.height, dimensions.width]);
+    // }, [uploadedImage, dimensions.height, dimensions.width]);
+  }, [originalImageUrl, dimensions.height, dimensions.width]);
 
   const handleFileUpload = (file: File) => {
     setOriginalImageFile(file);
@@ -61,9 +65,11 @@ export default function CanvasEditor() {
     reader.onload = () => {
       const dataUrl = reader.result as string;
 
-      setUploadedImage(dataUrl);
+      // setUploadedImage(dataUrl);
       setOriginalImageUrl(dataUrl);
-      setEditedImage(null);
+      // setEditedImage(null);
+      setEditedImages([]);
+      setEditedImageIndex(-1);
 
       const img = new Image();
 
@@ -123,8 +129,10 @@ export default function CanvasEditor() {
 
           let uploadedImageName: string | null;
 
-          if (editedImage && originalImageFile) {
-            const response = await fetch(editedImage);
+          // if (editedImage && originalImageFile) {
+          if (editedImages[editedImageIndex] && originalImageFile) {
+            // const response = await fetch(editedImage);
+            const response = await fetch(editedImages[editedImageIndex]);
             const imageBlob = await response.blob();
             const imageFileFromBlob = new File(
               [imageBlob],
@@ -153,7 +161,9 @@ export default function CanvasEditor() {
           if (response.ok) {
             const imageBlob = await response.blob();
             const imageUrl = URL.createObjectURL(imageBlob);
-            setEditedImage(imageUrl);
+            // setEditedImage(imageUrl);
+            setEditedImages((prev) => [...prev, imageUrl]);
+            setEditedImageIndex((prev) => prev + 1);
 
             return resolve();
           } else {
@@ -172,13 +182,18 @@ export default function CanvasEditor() {
   };
 
   const downloadImage = async () => {
-    if (!editedImage) {
+    // if (!editedImage) {
+    //   console.error("No edited image available to download");
+    //   return;
+    // }
+    if (!editedImages.length) {
       console.error("No edited image available to download");
       return;
     }
 
     try {
-      const response = await fetch(editedImage);
+      // const response = await fetch(editedImage);
+      const response = await fetch(editedImages[editedImageIndex]);
       const blob = await response.blob();
 
       const url = window.URL.createObjectURL(blob);
@@ -195,36 +210,58 @@ export default function CanvasEditor() {
     }
   };
 
-  const handleEyePress = () => {
-    setShowOriginalImageFile(true);
+  const handleShowPrevEditedImage = () => {
+    if (editedImages.length === 0) return;
+
+    setEditedImageIndex((prev) => {
+      if (prev === 0) return 0;
+      return prev - 1;
+    });
   };
 
-  const handleEyeRelease = () => {
-    setShowOriginalImageFile(false);
+  const handleShowNextEditedImage = () => {
+    if (editedImages.length === 0) return;
+
+    setEditedImageIndex((prev) => {
+      if (prev === editedImages.length - 1) return prev;
+      return prev + 1;
+    });
   };
 
   return (
     <section className="relative flex flex-col items-center">
-      <div className="absolute top-0 left-4 flex w-full items-center justify-start gap-8">
+      <div className="flex items-center justify-start gap-8 self-start">
         <FileUploader
           onFileUpload={handleFileUpload}
-          className="h-6 w-6"
-          loadArea={
-            <ImageIcon size={24} cursor="pointer" />
-          }
+          className="border-foreground/30 z-[1] flex h-8 w-8 cursor-pointer flex-wrap place-content-center rounded-sm border-1 hover:bg-amber-300/75"
+          loadArea={<ImageIcon size={24} />}
         />
 
-        {uploadedImage && (
+        {/* {uploadedImage && (
+          <p className="border-foreground/25 rounded-[3rem] border-1 p-[0.2rem_0.75rem]">{`${dimensions.width}x${dimensions.height}`}</p>
+        )} */}
+        {originalImageUrl && (
           <p className="border-foreground/25 rounded-[3rem] border-1 p-[0.2rem_0.75rem]">{`${dimensions.width}x${dimensions.height}`}</p>
         )}
       </div>
 
-      {!uploadedImage && (
+      {/* {!uploadedImage && (
         <FileUploader
           onFileUpload={handleFileUpload}
-          className="my-40 h-32 w-128"
+          className="my-40 h-32 w-128 cursor-pointer rounded-lg hover:bg-amber-300/75"
           loadArea={
-            <div className="border-foreground/30 flex h-full w-full items-center justify-center rounded-lg border-2 border-dotted hover:bg-amber-300/75">
+            <div className="border-foreground/30 flex h-full w-full items-center justify-center rounded-md border-2 border-dotted">
+              <p>Tap here to load your picture</p>
+            </div>
+          }
+        />
+      )} */}
+      {!originalImageUrl && (
+        <FileUploader
+          onFileUpload={handleFileUpload}
+          className="my-40 h-32 w-128 cursor-pointer rounded-lg hover:bg-amber-300/75"
+          loadArea={
+            <div className="border-foreground/30 flex h-full w-full items-center justify-center rounded-md border-2 border-dotted">
               <p>Tap here to load your picture</p>
             </div>
           }
@@ -244,7 +281,7 @@ export default function CanvasEditor() {
             "animate-pulsate": uploadingImage,
           })}
         >
-          {uploadedImage && !editedImage && (
+          {/* {uploadedImage && !editedImage && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={uploadedImage}
@@ -253,12 +290,22 @@ export default function CanvasEditor() {
               width={`${dimensions.width}px`}
               height={`${dimensions.height}px`}
             />
-          )}
-
-          {editedImage && (
+          )} */}
+          {originalImageUrl && !editedImages.length && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={editedImage}
+              src={originalImageUrl}
+              alt="Uploaded"
+              className="pointer-events-none absolute inset-0"
+              width={`${dimensions.width}px`}
+              height={`${dimensions.height}px`}
+            />
+          )}
+
+          {editedImages[editedImageIndex] && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={editedImages[editedImageIndex]}
               alt="Edited"
               className="pointer-events-none absolute inset-0"
               width={`${dimensions.width}px`}
@@ -290,49 +337,37 @@ export default function CanvasEditor() {
             dimensions={dimensions}
             brushSize={brushSize}
             zoomLevel={zoomLevel}
-            handleProcessImage={processImage}
+            onProcessImage={processImage}
             disabled={uploadingImage}
           />
         </div>
       )}
 
-      <div className="bg-background border-foreground/25 fixed bottom-6 flex animate-[slideUp_0.2s_ease-out] items-center justify-center gap-8 rounded-[3rem] border-1 p-[0.8rem_2rem]">
-        <p className="flex flex-row items-center justify-center gap-4">
-          <label htmlFor="brush-size" className="text-lg">
-            Brush
-          </label>
-          <Slider
-            id="brush-size"
-            className="w-50"
-            defaultValue={[brushSize]}
-            max={50}
-            min={1}
-            step={1}
-            onValueChange={(value) => setBrushSize(Number(value))}
-            disabled={!uploadedImage}
-          />
-        </p>
-
-        <div className="flex items-center gap-4">
-          <Download
-            className={cn("cursor-pointer", {
-              "cursor-default text-gray-500": !editedImage,
-            })}
-            size={24}
-            onClick={downloadImage}
-          />
-
-          <Eye
-            className={cn("cursor-pointer", {
-              "cursor-default text-gray-500": !editedImage,
-            })}
-            size={24}
-            onMouseDown={handleEyePress}
-            onMouseUp={handleEyeRelease}
-            onMouseLeave={handleEyeRelease}
-          />
-        </div>
-      </div>
+      <Controls
+        before={
+          <p className="flex flex-row items-center justify-center gap-4">
+            <label htmlFor="brush-size" className="text-lg">
+              Brush
+            </label>
+            <Slider
+              id="brush-size"
+              className="w-50"
+              defaultValue={[brushSize]}
+              max={50}
+              min={1}
+              step={1}
+              onValueChange={(value) => setBrushSize(Number(value))}
+              disabled={!originalImageUrl}
+            />
+          </p>
+        }
+        editedImagesCount={editedImages.length}
+        editedImageIndex={editedImageIndex}
+        onShowOriginalImageFile={setShowOriginalImageFile}
+        onDownloadEditedImage={downloadImage}
+        onUndoAction={handleShowPrevEditedImage}
+        onRedoAction={handleShowNextEditedImage}
+      />
     </section>
   );
 }
