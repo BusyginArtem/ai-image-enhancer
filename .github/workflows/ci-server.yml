@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Standard Python steps
-        uses: ./.github/actions/server
+        uses: ./.github/actions/server/action.yml
         with:
           NODE_VERSION: 3.12
 
@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Standard Python steps
-        uses: ./.github/actions/server
+        uses: ./.github/actions/server/action.yml
         with:
           NODE_VERSION: 3.12
 
@@ -109,7 +109,7 @@ jobs:
         language: ["python"]
     steps:
       - name: Standard Python steps
-        uses: ./.github/actions/server
+        uses: ./.github/actions/server/action.yml
         with:
           NODE_VERSION: 3.12
 
