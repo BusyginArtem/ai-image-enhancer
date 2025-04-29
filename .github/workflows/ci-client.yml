@@ -21,8 +21,10 @@ jobs:
     name: 📜 Lint Frontend Code
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Standard Node.js steps
-        uses: ./.github/actions/client/action.yml
+        uses: ./.github/actions/client
         with:
           NODE_VERSION: 22
 
@@ -63,8 +65,10 @@ jobs:
     name: 🛡️ Audit Frontend Packages
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Standard Node.js steps
-        uses: ./.github/actions/client/action.yml
+        uses: ./.github/actions/client
         with:
           NODE_VERSION: 22
 
@@ -103,8 +107,10 @@ jobs:
       security-events: write
       contents: read
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Standard Node.js steps
-        uses: ./.github/actions/client/action.yml
+        uses: ./.github/actions/client
         with:
           NODE_VERSION: 22
 
@@ -156,8 +162,10 @@ jobs:
     name: 🏗️ Build Frontend
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Standard Node.js steps
-        uses: ./.github/actions/client/action.yml
+        uses: ./.github/actions/client
         with:
           NODE_VERSION: 22
 
