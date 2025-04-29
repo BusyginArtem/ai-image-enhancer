@@ -6,7 +6,7 @@ on:
     paths:
       - "client/**"
       - ".github/workflows/ci-client.yml"
-    branches: 
+    branches:
       - main
   pull_request:
     paths:
@@ -21,32 +21,37 @@ jobs:
     name: 📜 Lint Frontend Code
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Standard Node.js steps
+        uses: ./.github/actions/client
         with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: client/package-lock.json
+          NODE_VERSION: 22
 
-      - name: Cache node_modules
-        id: cache-node-modules
-        uses: actions/cache@v4
-        with:
-          path: client/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+      # - name: Checkout repository
+      #   uses: actions/checkout@v4
 
-      - name: Log cache status
-        run: |
-          echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: "22"
+      #     cache: npm
+      #     cache-dependency-path: client/package-lock.json
 
-      - name: Install dependencies
-        run: |
-          cd client
-          npm ci
+      # - name: Cache node_modules
+      #   id: cache-node-modules
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: client/node_modules
+      #     key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+      #     restore-keys: ${{ runner.os }}-node-
+
+      # - name: Log cache status
+      #   run: |
+      #     echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
+
+      # - name: Install dependencies
+      #   run: |
+      #     cd client
+      #     npm ci
 
       - name: Run ESLint
         run: |
@@ -58,27 +63,32 @@ jobs:
     name: 🛡️ Audit Frontend Packages
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Standard Node.js steps
+        uses: ./.github/actions/client
         with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: client/package-lock.json
+          NODE_VERSION: 22
 
-      - name: Cache node_modules
-        id: cache-node-modules
-        uses: actions/cache@v4
-        with:
-          path: client/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+      # - name: Checkout repository
+      #   uses: actions/checkout@v4
 
-      - name: Log cache status
-        run: |
-          echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: "22"
+      #     cache: npm
+      #     cache-dependency-path: client/package-lock.json
+
+      # - name: Cache node_modules
+      #   id: cache-node-modules
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: client/node_modules
+      #     key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+      #     restore-keys: ${{ runner.os }}-node-
+
+      # - name: Log cache status
+      #   run: |
+      #     echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
 
       - name: Audit dependencies
         run: |
@@ -93,32 +103,37 @@ jobs:
       security-events: write
       contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Standard Node.js steps
+        uses: ./.github/actions/client
         with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: client/package-lock.json
+          NODE_VERSION: 22
 
-      - name: Cache node_modules
-        id: cache-node-modules
-        uses: actions/cache@v4
-        with:
-          path: client/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+      # - name: Checkout repository
+      #   uses: actions/checkout@v4
 
-      - name: Log cache status
-        run: |
-          echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: "22"
+      #     cache: npm
+      #     cache-dependency-path: client/package-lock.json
 
-      - name: Install dependencies
-        run: |
-          cd client
-          npm ci
+      # - name: Cache node_modules
+      #   id: cache-node-modules
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: client/node_modules
+      #     key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+      #     restore-keys: ${{ runner.os }}-node-
+
+      # - name: Log cache status
+      #   run: |
+      #     echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
+
+      # - name: Install dependencies
+      #   run: |
+      #     cd client
+      #     npm ci
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -141,27 +156,32 @@ jobs:
     name: 🏗️ Build Frontend
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Standard Node.js steps
+        uses: ./.github/actions/client
         with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: client/package-lock.json
+          NODE_VERSION: 22
 
-      - name: Cache node_modules
-        id: cache-node-modules
-        uses: actions/cache@v4
-        with:
-          path: client/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
+      # - name: Checkout repository
+      #   uses: actions/checkout@v4
 
-      - name: Log cache status
-        run: |
-          echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
+      # - name: Setup Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: "22"
+      #     cache: npm
+      #     cache-dependency-path: client/package-lock.json
+
+      # - name: Cache node_modules
+      #   id: cache-node-modules
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: client/node_modules
+      #     key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+      #     restore-keys: ${{ runner.os }}-node-
+
+      # - name: Log cache status
+      #   run: |
+      #     echo "Cache hit: ${{ steps.cache-node-modules.outputs.cache-hit }}"
 
       - name: Restore Next.js cache
         uses: actions/cache@v4
@@ -192,10 +212,10 @@ jobs:
           NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
           EOF
 
-      - name: Install dependencies
-        run: |
-          cd client
-          npm ci
+      # - name: Install dependencies
+      #   run: |
+      #     cd client
+      #     npm ci
 
       - name: Build with Next.js
         run: |

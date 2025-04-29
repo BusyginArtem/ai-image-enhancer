@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
+        description: "The ref to deploy"
         required: true
 
 concurrency:

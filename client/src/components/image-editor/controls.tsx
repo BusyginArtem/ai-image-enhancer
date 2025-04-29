@@ -15,9 +15,19 @@ type Props = {
   onRedoAction: () => void;
 };
 
-function IconContainer({ children }: { children: React.ReactNode }) {
+function IconContainer({
+  disabled,
+  children,
+}: {
+  disabled: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex h-8 w-8 cursor-pointer flex-wrap place-content-center rounded-sm hover:bg-amber-300/75">
+    <div
+      className={cn("flex h-8 w-8 flex-wrap place-content-center rounded-sm", {
+        "cursor-pointer hover:bg-amber-300/75": !disabled,
+      })}
+    >
       {children}
     </div>
   );
@@ -41,42 +51,46 @@ export default function Controls({
     onShowOriginalImageFile(false);
   };
 
+  const undoDisabled = !editedImagesCount || editedImageIndex === 0;
+  const redoDisabled =
+    !editedImagesCount || editedImageIndex === editedImagesCount - 1;
+  const downloadDisabled = !editedImagesCount;
+  const eyeDisabled = !editedImagesCount;
+
   return (
     <div className="bg-background border-foreground/25 fixed bottom-6 flex animate-[slideUp_0.2s_ease-out] items-center justify-center gap-8 rounded-[3rem] border-1 p-[0.8rem_2rem]">
       {before}
 
       <div className="flex items-center gap-4">
-        <IconContainer>
+        <IconContainer disabled={undoDisabled}>
           <Undo
             className={cn("", {
-              "cursor-default text-gray-500":
-                !editedImagesCount || editedImageIndex === 0,
+              "cursor-default text-gray-500": undoDisabled,
             })}
             onClick={onUndoAction}
           />
         </IconContainer>
-        <IconContainer>
+        <IconContainer disabled={redoDisabled}>
           <Redo
             className={cn("", {
-              "cursor-default text-gray-500":
-                !editedImagesCount || editedImageIndex === editedImagesCount - 1,
+              "cursor-default text-gray-500": redoDisabled,
             })}
             onClick={onRedoAction}
           />
         </IconContainer>
-        <IconContainer>
+        <IconContainer disabled={downloadDisabled}>
           <Download
             className={cn("", {
-              "cursor-default text-gray-500": !editedImagesCount,
+              "cursor-default text-gray-500": downloadDisabled,
             })}
             size={24}
             onClick={onDownloadEditedImage}
           />
         </IconContainer>
-        <IconContainer>
+        <IconContainer disabled={eyeDisabled}>
           <Eye
             className={cn("", {
-              "cursor-default text-gray-500": !editedImagesCount,
+              "cursor-default text-gray-500": eyeDisabled,
             })}
             size={24}
             onMouseDown={handleEyePress}
