@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
+        description: "The ref to deploy"
         required: true
 
 concurrency:
@@ -14,6 +15,7 @@ concurrency:
 jobs:
   deploy-server:
     runs-on: ubuntu-latest
+    environment: production
     container:
       image: ghcr.io/railwayapp/cli:3.21.0
       env:
