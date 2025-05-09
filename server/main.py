@@ -22,9 +22,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-BASE_DIR = "/app"
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
-
+# BASE_DIR = "/app"
+# UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
+print(f"Creating UPLOAD_FOLDER: {UPLOAD_FOLDER}")
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 

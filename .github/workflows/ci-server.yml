@@ -108,7 +108,6 @@ jobs:
         run: |
           cd server
           pip install -r requirements.txt
-          pip install pytest pytest-asyncio httpx
 
       - name: Run tests
         run: |
