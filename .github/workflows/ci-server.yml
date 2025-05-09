@@ -23,31 +23,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Standard Python steps
-        uses: ./.github/actions/server
+        uses: ./.github/actions/server-steps
         with:
           NODE_VERSION: 3.12
-
-      # - name: Checkout repository
-      #   uses: actions/checkout@v4
-
-      # - name: Setup Python environment
-      #   uses: actions/setup-python@v5.0.0
-      #   with:
-      #     python-version: "3.10"
-
-      # - name: Cache Python dependencies
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('server/requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-
-      # - name: Install requirements
-      #   run: |
-      #     cd server
-      #     pip install -r requirements.txt
-      #     pip install flake8 pylint
 
       - name: Install flake8 pylint
         run: |
@@ -70,30 +48,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Standard Python steps
-        uses: ./.github/actions/server
+        uses: ./.github/actions/server-steps
         with:
           NODE_VERSION: 3.12
-
-      # - name: Checkout repository
-      #   uses: actions/checkout@v4
-
-      # - name: Set up Python
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: "3.10"
-
-      # - name: Cache Python dependencies
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('server/requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-
-      # - name: Install dependencies
-      #   run: |
-      #     cd server
-      #     pip install -r requirements.txt
 
       - name: Run pip-audit
         run: |
@@ -115,30 +72,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Standard Python steps
-        uses: ./.github/actions/server
+        uses: ./.github/actions/server-steps
         with:
           NODE_VERSION: 3.12
-
-      # - name: Checkout repository
-      #   uses: actions/checkout@v4
-
-      # - name: Set up Python
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: '3.10'
-
-      # - name: Cache Python dependencies
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('server/requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-
-      # - name: Install dependencies
-      #   run: |
-      #     cd server
-      #     pip install -r requirements.txt
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -156,10 +92,33 @@ jobs:
         with:
           category: ${{ matrix.language }}
 
+  test:
+    runs-on: ubuntu-latest
+    needs: [lint, npm-audit-dependencies, codeql]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Standard Python steps
+        uses: ./.github/actions/server-steps
+        with:
+          NODE_VERSION: 3.12
+
+      - name: Install test dependencies
+        run: |
+          cd server
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio httpx
+
+      - name: Run tests
+        run: |
+          cd server
+          pytest
+
   trigger-deploy:
     name: 🚚 Start Server Deployment
     if: github.ref == 'refs/heads/main'
-    needs: [lint, npm-audit-dependencies, codeql]
+    needs: [test]
     runs-on: ubuntu-latest
     permissions: write-all
     steps:

@@ -4,3 +4,6 @@ requests
 python-multipart
 setuptools>=65.5.1
 uuid
+pytest
+pytest-asyncio
+httpx

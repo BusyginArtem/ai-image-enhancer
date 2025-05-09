@@ -1,23 +1,28 @@
 FROM node:lts-slim AS builder
 
 WORKDIR /app
+
 COPY package.json package-lock.json ./
 RUN npm install
 
 COPY . ./
 RUN npm run build
 
-# Use lightweight image for production
 FROM node:lts-slim AS runner
-WORKDIR /app
 
+WORKDIR /app
 
 COPY --from=builder /app/next.config.ts ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/package.json ./
-RUN npm install --production
+COPY --from=builder /app/package-lock.json ./
 
-EXPOSE 3000
+RUN npm install --production --frozen-lockfile
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+EXPOSE ${PORT}
 
 CMD ["npm", "run", "start"]

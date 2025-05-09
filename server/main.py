@@ -42,15 +42,14 @@ def upload_image(file: UploadFile = File(...)):
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename is required")
 
-    file_extension = os.path.splitext(file.filename)[1].lower()
+    [file_name, file_extension] = os.path.splitext(file.filename)
     allowed_extensions = {".png", ".jpg", ".jpeg"}
 
-    if file_extension not in allowed_extensions:
+    if file_extension.lower() not in allowed_extensions:
         raise HTTPException(status_code=400, detail="Unsupported file type")
 
     try:
-        filename = file.filename if file.filename else "default_filename"
-        unique_filename = f"{filename}-{uuid.uuid4()}"
+        unique_filename = f"{file_name}-{uuid.uuid4()}{file_extension}"
         file_path = os.path.join(UPLOAD_FOLDER, os.path.basename(unique_filename))
 
         with open(file_path, "wb") as buffer:

@@ -10,9 +10,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 8080
+ENV PORT=8080
+ENV MODEL=lama
+ENV DEVICE=cpu
 
-CMD ["sh", "-c", "lama-cleaner --host 0.0.0.0 --port ${PORT:-8080} --model lama --device cpu"]
-# CMD ["sh", "-c", "lama-cleaner --host 0.0.0.0 --port ${PORT:-8080} --model lama --device cpu --debug --no-half --cpu-offload --disable-nsfw --sd-cpu-textencoder"]
+EXPOSE ${PORT}
+
+ENTRYPOINT ["sh", "-c"]
+CMD ["lama-cleaner --host 0.0.0.0 --port ${PORT} --model ${MODEL} --device ${DEVICE}"]
