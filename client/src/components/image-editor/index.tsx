@@ -14,10 +14,8 @@ const apiUrl = clientEnv.NEXT_PUBLIC_SERVER_API_URL;
 const DEFAULT_IMAGE_WIDTH = 600;
 
 export default function CanvasEditor() {
-  // const [editedImage, setEditedImage] = useState<string | null>(null);
   const [editedImages, setEditedImages] = useState<string[]>([]);
   const [editedImageIndex, setEditedImageIndex] = useState(-1);
-  // const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [originalImageFile, setOriginalImageFile] = useState<File | null>(null);
   const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
 
@@ -29,6 +27,7 @@ export default function CanvasEditor() {
     width: number;
     height: number;
   }>({ width: 0, height: 0 });
+  const [uploadButtonLabel, setUploadButtonLabel] = useState("Upload image");
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -54,20 +53,18 @@ export default function CanvasEditor() {
         container.removeEventListener("wheel", handleWheel);
       };
     }
-    // }, [uploadedImage, dimensions.height, dimensions.width]);
   }, [originalImageUrl, dimensions.height, dimensions.width]);
 
   const handleFileUpload = (file: File) => {
     setOriginalImageFile(file);
+    setUploadButtonLabel(`Uploaded: ${file.name}`);
 
     const reader = new FileReader();
 
     reader.onload = () => {
       const dataUrl = reader.result as string;
 
-      // setUploadedImage(dataUrl);
       setOriginalImageUrl(dataUrl);
-      // setEditedImage(null);
       setEditedImages([]);
       setEditedImageIndex(-1);
 
@@ -129,9 +126,7 @@ export default function CanvasEditor() {
 
           let uploadedImageName: string | null;
 
-          // if (editedImage && originalImageFile) {
           if (editedImages[editedImageIndex] && originalImageFile) {
-            // const response = await fetch(editedImage);
             const response = await fetch(editedImages[editedImageIndex]);
             const imageBlob = await response.blob();
             const imageFileFromBlob = new File(
@@ -161,7 +156,7 @@ export default function CanvasEditor() {
           if (response.ok) {
             const imageBlob = await response.blob();
             const imageUrl = URL.createObjectURL(imageBlob);
-            // setEditedImage(imageUrl);
+
             setEditedImages((prev) => [...prev, imageUrl]);
             setEditedImageIndex((prev) => prev + 1);
 
@@ -182,17 +177,12 @@ export default function CanvasEditor() {
   };
 
   const downloadImage = async () => {
-    // if (!editedImage) {
-    //   console.error("No edited image available to download");
-    //   return;
-    // }
     if (!editedImages.length) {
       console.error("No edited image available to download");
       return;
     }
 
     try {
-      // const response = await fetch(editedImage);
       const response = await fetch(editedImages[editedImageIndex]);
       const blob = await response.blob();
 
@@ -234,28 +224,18 @@ export default function CanvasEditor() {
         <FileUploader
           onFileUpload={handleFileUpload}
           className="border-foreground/30 z-[1] flex h-8 w-8 cursor-pointer flex-wrap place-content-center rounded-sm border-1 hover:bg-amber-300/75"
-          loadArea={<ImageIcon size={24} />}
+          loadArea={
+            <span role="button" aria-label={uploadButtonLabel} tabIndex={0}>
+              <ImageIcon size={24} aria-hidden="true" />
+            </span>
+          }
         />
 
-        {/* {uploadedImage && (
-          <p className="border-foreground/25 rounded-[3rem] border-1 p-[0.2rem_0.75rem]">{`${dimensions.width}x${dimensions.height}`}</p>
-        )} */}
         {originalImageUrl && (
           <p className="border-foreground/25 rounded-[3rem] border-1 p-[0.2rem_0.75rem]">{`${dimensions.width}x${dimensions.height}`}</p>
         )}
       </div>
 
-      {/* {!uploadedImage && (
-        <FileUploader
-          onFileUpload={handleFileUpload}
-          className="my-40 h-32 w-128 cursor-pointer rounded-lg hover:bg-amber-300/75"
-          loadArea={
-            <div className="border-foreground/30 flex h-full w-full items-center justify-center rounded-md border-2 border-dotted">
-              <p>Tap here to load your picture</p>
-            </div>
-          }
-        />
-      )} */}
       {!originalImageUrl && (
         <FileUploader
           onFileUpload={handleFileUpload}
@@ -281,21 +261,11 @@ export default function CanvasEditor() {
             "animate-pulsate": uploadingImage,
           })}
         >
-          {/* {uploadedImage && !editedImage && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={uploadedImage}
-              alt="Uploaded"
-              className="pointer-events-none absolute inset-0"
-              width={`${dimensions.width}px`}
-              height={`${dimensions.height}px`}
-            />
-          )} */}
           {originalImageUrl && !editedImages.length && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={originalImageUrl}
-              alt="Uploaded"
+              alt="Original uploaded image"
               className="pointer-events-none absolute inset-0"
               width={`${dimensions.width}px`}
               height={`${dimensions.height}px`}
@@ -306,7 +276,7 @@ export default function CanvasEditor() {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={editedImages[editedImageIndex]}
-              alt="Edited"
+              alt={`Edited image ${editedImageIndex + 1} of ${editedImages.length}`}
               className="pointer-events-none absolute inset-0"
               width={`${dimensions.width}px`}
               height={`${dimensions.height}px`}
@@ -317,7 +287,7 @@ export default function CanvasEditor() {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={originalImageUrl}
-              alt="Original"
+              alt="Original image (comparison view)"
               className="pointer-events-none absolute inset-0 z-[2]"
               width={`${dimensions.width}px`}
               height={`${dimensions.height}px`}
@@ -330,6 +300,7 @@ export default function CanvasEditor() {
                 "absolute z-[3] ml-[-2%] h-full w-1.5 bg-[var(--yellow-accent)] transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]",
                 showOriginalImageFile ? "ml-[calc(100%_-_4px)]" : "ml-[-2%]",
               )}
+              aria-hidden="true"
             />
           </div>
 
@@ -339,6 +310,7 @@ export default function CanvasEditor() {
             zoomLevel={zoomLevel}
             onProcessImage={processImage}
             disabled={uploadingImage}
+            aria-label="Image editing canvas"
           />
         </div>
       )}
@@ -358,6 +330,10 @@ export default function CanvasEditor() {
               step={1}
               onValueChange={(value) => setBrushSize(Number(value))}
               disabled={!originalImageUrl}
+              aria-label="Brush size"
+              aria-valuemin={1}
+              aria-valuemax={50}
+              aria-valuenow={brushSize}
             />
           </p>
         }

@@ -1,2 +1,44 @@
+# Node.js dependencies
 node_modules
-npm-debug.log
+
+# Build output
+.next
+out
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+*.log
+logs/
+
+# Version control
+.git
+.gitignore
+
+# Temporary files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor files
+.vscode
+.idea
+
+# Tests
+__tests__/
+*.test.js
+*.spec.js
+*.test.ts
+*.spec.ts
+
+# Documentation
+docs/
+
+# Unnecessary assets
+*.mp4
+*.psd
+*.zip

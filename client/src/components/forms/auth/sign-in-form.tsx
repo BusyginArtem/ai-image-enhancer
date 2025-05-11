@@ -40,27 +40,44 @@ export default function SignInForm() {
       }}
       className="space-y-2"
     >
-      <FormInput
-        placeholder="Email"
-        type="email"
-        autoComplete="email"
-        error={form.formState?.errors?.email}
-        {...form.register("email")}
-      />
-
-      <FormInput
-        placeholder="Password"
-        type="password"
-        autoComplete="new-password"
-        error={form.formState?.errors?.password}
-        {...form.register("password")}
-      />
+      <div>
+        <label htmlFor="email" className="sr-only">
+          Email
+        </label>
+        <FormInput
+          id="email"
+          placeholder="Email"
+          type="email"
+          autoComplete="email"
+          error={form.formState?.errors?.email}
+          {...form.register("email")}
+          aria-invalid={!!form.formState?.errors?.email} //ARIA
+        />
+      </div>
+      <div>
+        <label htmlFor="password" className="sr-only">
+          Password
+        </label>
+        <FormInput
+          id="password"
+          placeholder="Password"
+          type="password"
+          autoComplete="current-password" // Changed to current-password
+          error={form.formState?.errors?.password}
+          {...form.register("password")}
+          aria-invalid={!!form.formState?.errors?.password} //ARIA
+        />
+      </div>
 
       <Button disabled={isPending} type="submit" className="w-full">
         Sign In
       </Button>
 
-      <span className="inline-block h-4 w-full text-sm text-red-500">
+      <span
+        className="inline-block h-4 w-full text-sm text-red-500"
+        role="alert"
+        aria-live="assertive"
+      >
         {!formState?.success ? formState?.message : ""}
       </span>
     </form>

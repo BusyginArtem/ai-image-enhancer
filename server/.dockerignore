@@ -1,0 +1,35 @@
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+*.env
+
+# Logs
+*.log
+logs/
+
+# Version control
+.git/
+.gitignore
+
+# Temporary files
+.DS_Store
+Thumbs.db
+*.swp
+
+# Test files
+tests/
+*.test.py
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# Docker-related files
+docker-compose.override.yml
