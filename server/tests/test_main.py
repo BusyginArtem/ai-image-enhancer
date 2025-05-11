@@ -4,10 +4,10 @@ import os
 import tempfile
 import shutil
 import uuid
+import pytest
 
 from fastapi.testclient import TestClient
 from fastapi import HTTPException, UploadFile
-import pytest
 
 from main import app, UPLOAD_FOLDER, upload_image, process_image
 
