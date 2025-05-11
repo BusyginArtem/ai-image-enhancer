@@ -207,46 +207,46 @@ async def _read_mask_data(mask: UploadFile) -> BytesIO:
 def _prepare_api_payload(image_path: str, mask: UploadFile, mask_buffer: BytesIO) -> tuple[dict, dict]:
     """Prepares the files and data payload for the Lama Cleaner API."""
     files = {}
-    image_file = open(image_path, "rb")
-    files["image"] = (os.path.basename(image_path), image_file, "image/png")
-    files["mask"] = (mask.filename, mask_buffer, "image/png")
+    with open(image_path, "rb") as image_file:
+        files["image"] = (os.path.basename(image_path), image_file, "image/png")
+        files["mask"] = (mask.filename, mask_buffer, "image/png")
 
-    data = {
-        "ldmSteps": "25",
-        "ldmSampler": "plms",
-        "zitsWireframe": "true",
-        "hdStrategy": "Crop",
-        "hdStrategyCropMargin": "196",
-        "hdStrategyCropTrigerSize": "800",
-        "hdStrategyResizeLimit": "2048",
-        "prompt": "",
-        "croperX": "-91",
-        "croperY": "-66",
-        "croperHeight": "512",
-        "croperWidth": "512",
-        "useCroper": "false",
-        "sdMaskBlur": "5",
-        "sdStrength": "0.75",
-        "sdSteps": "50",
-        "sdGuidanceScale": "7.5",
-        "sdSampler": "uni_pc",
-        "sdSeed": "-1",
-        "negativePrompt": "",
-        "sdMatchHistograms": "false",
-        "sdScale": "1",
-        "cv2Radius": "5",
-        "cv2Flag": "INPAINT_NS",
-        "paintByExampleSteps": "50",
-        "paintByExampleGuidanceScale": "7.5",
-        "paintByExampleSeed": "-1",
-        "paintByExampleMaskBlur": "5",
-        "paintByExampleMatchHistograms": "false",
-        "p2pSteps": "50",
-        "p2pImageGuidanceScale": "1.5",
-        "p2pGuidanceScale": "7.5",
-        "controlnet_conditioning_scale": "0.4",
-        "controlnet_method": "control_v11p_sd15_canny",
-    }
+        data = {
+            "ldmSteps": "25",
+            "ldmSampler": "plms",
+            "zitsWireframe": "true",
+            "hdStrategy": "Crop",
+            "hdStrategyCropMargin": "196",
+            "hdStrategyCropTrigerSize": "800",
+            "hdStrategyResizeLimit": "2048",
+            "prompt": "",
+            "croperX": "-91",
+            "croperY": "-66",
+            "croperHeight": "512",
+            "croperWidth": "512",
+            "useCroper": "false",
+            "sdMaskBlur": "5",
+            "sdStrength": "0.75",
+            "sdSteps": "50",
+            "sdGuidanceScale": "7.5",
+            "sdSampler": "uni_pc",
+            "sdSeed": "-1",
+            "negativePrompt": "",
+            "sdMatchHistograms": "false",
+            "sdScale": "1",
+            "cv2Radius": "5",
+            "cv2Flag": "INPAINT_NS",
+            "paintByExampleSteps": "50",
+            "paintByExampleGuidanceScale": "7.5",
+            "paintByExampleSeed": "-1",
+            "paintByExampleMaskBlur": "5",
+            "paintByExampleMatchHistograms": "false",
+            "p2pSteps": "50",
+            "p2pImageGuidanceScale": "1.5",
+            "p2pGuidanceScale": "7.5",
+            "controlnet_conditioning_scale": "0.4",
+            "controlnet_method": "control_v11p_sd15_canny",
+        }
     return files, data
 
 
