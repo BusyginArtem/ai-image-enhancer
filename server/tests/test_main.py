@@ -1,12 +1,13 @@
-import os
 from unittest.mock import AsyncMock, MagicMock
-from fastapi.testclient import TestClient
-from fastapi import HTTPException, UploadFile
 from io import BytesIO
+import os
+import tempfile
 import shutil
 import uuid
+
+from fastapi.testclient import TestClient
+from fastapi import HTTPException, UploadFile
 import pytest
-import tempfile
 
 from main import app, UPLOAD_FOLDER, upload_image, process_image
 
@@ -116,7 +117,7 @@ async def test_process_image_success(monkeypatch):
     assert response.status_code == 200
     assert response.body == b"processed_image_data"
     assert response.headers["content-type"] == "image/png"
-    assert not os.path.exists(image_path)  # Ensure the image was deleted
+    assert not os.path.exists(image_path)
 
 
 @pytest.mark.asyncio
@@ -154,7 +155,7 @@ async def test_process_image_failure(monkeypatch):
 
     assert excinfo.value.status_code == 500
     assert "Processing failed: Lama Cleaner failed" in excinfo.value.detail
-    assert not os.path.exists(image_path)  # Ensure the image was deleted
+    assert not os.path.exists(image_path)
 
 
 @pytest.mark.asyncio
