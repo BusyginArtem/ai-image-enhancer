@@ -204,10 +204,11 @@ async def _read_mask_data(mask: UploadFile) -> BytesIO:
 
 def _prepare_api_payload(image_path: str, mask: UploadFile, mask_buffer: BytesIO) -> tuple[dict, dict]:
     """Prepares the files and data payload for the Lama Cleaner API."""
-    files = {
-        "image": (os.path.basename(image_path), open(image_path, "rb"), "image/png"),
-        "mask": (mask.filename, mask_buffer, "image/png"),
-    }
+    files = {}
+    image_file = open(image_path, "rb")
+    files["image"] = (os.path.basename(image_path), image_file, "image/png")
+    files["mask"] = (mask.filename, mask_buffer, "image/png")
+
     data = {
         "ldmSteps": "25",
         "ldmSampler": "plms",
