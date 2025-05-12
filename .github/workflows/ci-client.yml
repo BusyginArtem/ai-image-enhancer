@@ -17,19 +17,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  debug_changes:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch the entire history
-      - name: List changed files
-        run: |
-          echo "Changed files:"
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
-          echo "Event context:"
-          jq . ${{ github.event_path }}
+  # debug_changes:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0  # Fetch the entire history
+  #     - name: List changed files
+  #       run: |
+  #         echo "Changed files:"
+  #         git diff --name-only ${{ github.event.before }} ${{ github.sha }}
+  #         echo "Event context:"
+  #         jq . ${{ github.event_path }}
 
   should_run_client:
     runs-on: ubuntu-latest
@@ -39,17 +39,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
 
       - name: Get changed client files in PR
         id: check_changes
         run: |
-          changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.event.pull_request.head.sha }} | grep '^client/')
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base=${{ github.event.pull_request.base.sha }}
+            head=${{ github.event.pull_request.head.sha }}
+          else
+            base=${{ github.event.before }}
+            head=${{ github.sha }}
+          fi
+
+          echo "Checking changes between $base and $head"
+
+          changed_files=$(git diff --name-only "$base" "$head" | grep '^client/')
+          echo "Changed files:"
+          git diff --name-only "$base" "$head"
+
           if [[ -n "$changed_files" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
           fi
+
   lint:
     name: 📜 Lint Frontend Code
     needs: should_run_client
