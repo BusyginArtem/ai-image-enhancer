@@ -31,43 +31,43 @@ jobs:
   #         echo "Event context:"
   #         jq . ${{ github.event_path }}
 
-  should_run_client:
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.check_changes.outputs.run }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+  # should_run_client:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     run: ${{ steps.check_changes.outputs.run }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 2
 
-      - name: Get changed client files in PR
-        id: check_changes
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            base=${{ github.event.pull_request.base.sha }}
-            head=${{ github.event.pull_request.head.sha }}
-          else
-            base=${{ github.event.before }}
-            head=${{ github.sha }}
-          fi
+  #     - name: Get changed client files in PR
+  #       id: check_changes
+  #       run: |
+  #         if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+  #           base=${{ github.event.pull_request.base.sha }}
+  #           head=${{ github.event.pull_request.head.sha }}
+  #         else
+  #           base=${{ github.event.before }}
+  #           head=${{ github.sha }}
+  #         fi
 
-          echo "Checking changes between $base and $head"
+  #         echo "Checking changes between $base and $head"
 
-          changed_files=$(git diff --name-only "$base" "$head" | grep '^client/')
-          echo "Changed files:"
-          git diff --name-only "$base" "$head"
+  #         changed_files=$(git diff --name-only "$base" "$head" | grep '^client/')
+  #         echo "Changed files:"
+  #         git diff --name-only "$base" "$head"
 
-          if [[ -n "$changed_files" ]]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
+  #         if [[ -n "$changed_files" ]]; then
+  #           echo "run=true" >> "$GITHUB_OUTPUT"
+  #         else
+  #           echo "run=false" >> "$GITHUB_OUTPUT"
+  #         fi
 
   lint:
     name: 📜 Lint Frontend Code
-    needs: should_run_client
-    if: needs.should_run_client.outputs.run == 'true'
+    # needs: should_run_client
+    # if: needs.should_run_client.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -85,8 +85,8 @@ jobs:
 
   npm-audit-dependencies:
     name: 🛡️ Audit Frontend Packages
-    needs: should_run_client
-    if: needs.should_run_client.outputs.run == 'true'
+    # needs: should_run_client
+    # if: needs.should_run_client.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -104,8 +104,8 @@ jobs:
 
   static-analysis:
     name: 🔬 Static Analysis (TypeScript)
-    needs: should_run_client
-    if: needs.should_run_client.outputs.run == 'true'
+    # needs: should_run_client
+    # if: needs.should_run_client.outputs.run == 'true'
     runs-on: ubuntu-latest
     permissions:
       security-events: write
