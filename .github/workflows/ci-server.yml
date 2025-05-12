@@ -6,32 +6,30 @@ on:
     paths:
       - "server/**"
       - ".github/workflows/ci-server.yml"
-      - ".github/workflows/cd-server.yml"
     branches:
       - main
   pull_request:
     paths:
       - "server/**"
       - ".github/workflows/ci-server.yml"
-      - ".github/workflows/cd-server.yml"
     branches:
       - main
   workflow_dispatch:
 
 jobs:
-  debug_changes:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: List changed files
-        run: |
-          echo "Changed files:"
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
-          echo "Event context:"
-          jq . ${{ github.event_path }}
+  # debug_changes:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     - name: List changed files
+  #       run: |
+  #         echo "Changed files:"
+  #         git diff --name-only ${{ github.event.before }} ${{ github.sha }}
+  #         echo "Event context:"
+  #         jq . ${{ github.event_path }}
 
   should_run_server:
     runs-on: ubuntu-latest
@@ -137,7 +135,7 @@ jobs:
           category: ${{ matrix.language }}
 
   test:
-    name: ✈ CodeQL Analysis
+    name: ✈ Test server
     runs-on: ubuntu-latest
     needs: [lint, audit-dependencies, codeql]
     steps:
