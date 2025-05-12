@@ -30,7 +30,7 @@ jobs:
           git diff --name-only ${{ github.event.before }} ${{ github.sha }}
           echo "Event context:"
           jq . ${{ github.event_path }}
-          
+
   should_run_client:
     runs-on: ubuntu-latest
     outputs:
@@ -44,7 +44,12 @@ jobs:
       - name: Get changed client files in PR
         id: check_changes
         run: |
-          git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.event.pull_request.head.sha }} | grep '^client/' && echo "::set-output name=run::true" || echo "::set-output name=run::false"
+          changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.event.pull_request.head.sha }} | grep '^client/')
+          if [[ -n "$changed_files" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
   lint:
     name: 📜 Lint Frontend Code
     needs: should_run_client
