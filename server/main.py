@@ -9,7 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 
 import httpx
-# import requests
 
 app = FastAPI()
 
