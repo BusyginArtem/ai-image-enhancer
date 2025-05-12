@@ -31,29 +31,29 @@ jobs:
   #         echo "Event context:"
   #         jq . ${{ github.event_path }}
 
-  should_run_server:
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.check_changes.outputs.run }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  # should_run_server:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     run: ${{ steps.check_changes.outputs.run }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Get changed server files in PR
-        id: check_changes
-        run: |
-          changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.event.pull_request.head.sha }} | grep '^server/')
-          if [[ -n "$changed_files" ]]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
+  #     - name: Get changed server files in PR
+  #       id: check_changes
+  #       run: |
+  #         changed_files=$(git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.event.pull_request.head.sha }} | grep '^server/')
+  #         if [[ -n "$changed_files" ]]; then
+  #           echo "run=true" >> "$GITHUB_OUTPUT"
+  #         else
+  #           echo "run=false" >> "$GITHUB_OUTPUT"
+  #         fi
   lint:
     name: 📜 Lint Server Code
-    needs: should_run_server
-    if: needs.should_run_server.outputs.run == 'true'
+    # needs: should_run_server
+    # if: needs.should_run_server.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -80,8 +80,8 @@ jobs:
 
   audit-dependencies:
     name: 🛡️ Audit Frontend Packages
-    needs: should_run_server
-    if: needs.should_run_server.outputs.run == 'true'
+    # needs: should_run_server
+    # if: needs.should_run_server.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -100,8 +100,8 @@ jobs:
 
   codeql:
     name: 🔬 CodeQL Analysis
-    needs: should_run_server
-    if: needs.should_run_server.outputs.run == 'true'
+    # needs: should_run_server
+    # if: needs.should_run_server.outputs.run == 'true'
     runs-on: ubuntu-latest
     permissions:
       security-events: write
