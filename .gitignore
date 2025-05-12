@@ -12,3 +12,6 @@
 
 # vscode
 .vscode
+
+# test cache
+.pytest_cache

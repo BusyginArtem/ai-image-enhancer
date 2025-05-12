@@ -5,5 +5,12 @@
     "source.organizeImports": "always"
   },
   "flake8.args": ["--ignore=E501,E231", "--max-line-length=90"],
-  "pylint.args": ["--disable=C0301,C0103"]
+  "pylint.args": [
+    "--disable=C0301,C0103"
+  ],
+  "python.testing.pytestArgs": [
+    "server"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }
