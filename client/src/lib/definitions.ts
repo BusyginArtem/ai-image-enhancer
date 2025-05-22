@@ -26,7 +26,7 @@ export type AuthFormState =
     }
   | undefined;
 
-type NavLabel = "Home" | "Wallet" | "Market";
+type NavLabel = "Home" | "Inpaint";
 
 export type NavItem = {
   label: NavLabel;
