@@ -11,6 +11,7 @@ services:
       - NEXT_PUBLIC_SERVER_API_URL=http://localhost:8000
     env_file:
       - client/.env.local
+  # Remove
     # volumes:
     #   - ./client:/app
     #   - /app/node_modules    
@@ -31,9 +32,9 @@ services:
 
   lama-cleaner:
     build:
-      context: ./server/lama-cleaner
+      context: ./lama-cleaner
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    volumes:
-      - ./lama-cleaner/models:/root/.cache
+    # volumes:
+      # - ./lama-cleaner/models:/root/.cache

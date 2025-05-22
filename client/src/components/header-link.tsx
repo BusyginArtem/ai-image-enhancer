@@ -3,8 +3,8 @@
 import Link from "next/link";
 
 import { NavItem } from "@/lib/definitions";
-import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 export default function HeaderLink({ label, href, target }: NavItem) {
   const pathname = usePathname();

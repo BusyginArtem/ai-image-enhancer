@@ -7,7 +7,7 @@
 *.log
 
 # Specific root-level ignores
-/lama-cleaner
+/lama-cleaner/models
 /lama-cleaner-cache
 
 # vscode

@@ -33,5 +33,5 @@ jobs:
 
       - name: Deploy Lama Cleaner to Railway
         run: |
-          cd server/lama-cleaner
+          cd lama-cleaner
           railway up --service=${{ vars.RAILWAY_LAMA_CLEANER_SERVICE_NAME }} --verbose
