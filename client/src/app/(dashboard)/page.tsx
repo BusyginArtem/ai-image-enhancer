@@ -2,6 +2,17 @@
 
 import Image from "next/image";
 
+// const imageLoader: ImageLoader = (config: ImageLoaderProps) => {
+//   const { src, quality } = config;
+//   const srcPaths = src.split("upload/");
+//   const urlStart = srcPaths[0];
+//   const urlEnd = srcPaths[1];
+//   const transformations = `h_200,q_${quality}`;
+
+//   return `${urlStart}upload/${transformations}/${urlEnd}`;
+// };
+
+
 export default async function Dashboard() {
   return (
     // <PageAnimateFadeWrapper>
@@ -24,9 +35,11 @@ export default async function Dashboard() {
         <div className="h-min-[18rem] relative aspect-video w-full lg:w-1/2">
           <Image
             fill={true}
-            src="https://res.cloudinary.com/dtrl8p5mc/image/upload/v1747840884/Gemini_Generated_Image_q7ow18q7ow18q7ow_1_znitwu.jpg"
+            // loader={imageLoader}
+            quality={75}
+            src="https://res.cloudinary.com/dtrl8p5mc/image/upload/v1748010203/robadb7wifuizlo5trvq.jpg"
             alt="An example of inpainting"
-            className="rounded-lg px-6 shadow-2xl"
+            className="px-6 shadow-2xl"
           />
         </div>
       </div>
