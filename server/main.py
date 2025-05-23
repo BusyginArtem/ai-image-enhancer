@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 
 import httpx
+import traceback
 
 app = FastAPI()
 
@@ -178,7 +179,6 @@ async def process_image(
         print(f"[http_exc]: {http_exc}")
         raise http_exc
     except Exception as e:
-        import traceback
         error_message = f"Error processing image: {str(e)}"
         print(f"UNEXPECTED ERROR in /inpaint/process: {error_message}")
         print(traceback.format_exc())
