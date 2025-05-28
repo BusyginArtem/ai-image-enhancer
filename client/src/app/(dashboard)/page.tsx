@@ -18,12 +18,12 @@ export default async function Dashboard() {
             </p>
           </div>
         </div>
-        <div className="relative max-h-[75%] min-h-[16rem] max-w-[75%] min-w-[20rem] place-self-center sm:min-h-[20rem] sm:min-w-[25rem]">
+        <div className="relative max-h-[75%] min-h-[16rem] max-w-[75%] min-w-[18rem] place-self-center sm:min-h-[23rem] sm:min-w-[25rem]">
           <ExternalImage
             fill={true}
             src="https://res.cloudinary.com/dtrl8p5mc/image/upload/v1748010203/robadb7wifuizlo5trvq.jpg"
             alt="An example of inpainting"
-            className="px-6 shadow-2xl"
+            className="shadow-2xl rounded-md"
           />
         </div>
       </div>
