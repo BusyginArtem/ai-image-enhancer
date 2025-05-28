@@ -107,11 +107,13 @@ export default function CanvasEditor() {
       }
     } catch (error) {
       console.error("Upload failed:", error);
-      return null;
+      throw error;
     }
   };
 
-  const processImage = async (mask: HTMLCanvasElement): Promise<void> => {
+  const processImage = async (
+    mask: HTMLCanvasElement,
+  ): Promise<void | never> => {
     if (!mask) return;
 
     return new Promise((resolve, reject) => {
@@ -168,7 +170,7 @@ export default function CanvasEditor() {
           }
         } catch (error) {
           console.error("Processing failed:", error);
-          return reject();
+          return reject(error);
         } finally {
           setUploadingImage(false);
         }
@@ -225,7 +227,16 @@ export default function CanvasEditor() {
           onFileUpload={handleFileUpload}
           className="border-foreground/30 z-[1] flex h-8 w-8 cursor-pointer flex-wrap place-content-center rounded-sm border-1 hover:bg-amber-300/75"
           loadArea={
-            <span role="button" aria-label={uploadButtonLabel} tabIndex={0}>
+            <span
+              role="button"
+              aria-label={uploadButtonLabel}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  // trigger upload
+                }
+              }}
+            >
               <ImageIcon size={24} aria-hidden="true" />
             </span>
           }

@@ -1,24 +1,10 @@
-// import PageAnimateFadeWrapper from "@/components/animate/PageAnimateFadeWrapper";
-
-import Image from "next/image";
-
-// const imageLoader: ImageLoader = (config: ImageLoaderProps) => {
-//   const { src, quality } = config;
-//   const srcPaths = src.split("upload/");
-//   const urlStart = srcPaths[0];
-//   const urlEnd = srcPaths[1];
-//   const transformations = `h_200,q_${quality}`;
-
-//   return `${urlStart}upload/${transformations}/${urlEnd}`;
-// };
-
+import ExternalImage from "@/components/ui/image-post";
 
 export default async function Dashboard() {
   return (
-    // <PageAnimateFadeWrapper>
     <main className="container py-10 text-center lg:pt-12">
-      <div className="-m-6 flex flex-wrap items-center pt-24 pb-24 md:pt-32">
-        <div className="w-full p-6 lg:w-1/2">
+      <div className="-m-6 grid grid-cols-1 pt-24 pb-24 md:pt-32 lg:grid-cols-2 gap-8">
+        <div className="w-full p-6">
           <div className="lg:max-w-xl">
             <h1 className="font-roboto text-foreground mb-8 text-start text-3xl font-bold md:text-6xl">
               Discover the power of AI image inpaint
@@ -32,11 +18,9 @@ export default async function Dashboard() {
             </p>
           </div>
         </div>
-        <div className="h-min-[18rem] relative aspect-video w-full lg:w-1/2">
-          <Image
+        <div className="relative max-h-[75%] min-h-[16rem] max-w-[75%] min-w-[20rem] place-self-center sm:min-h-[20rem] sm:min-w-[25rem]">
+          <ExternalImage
             fill={true}
-            // loader={imageLoader}
-            quality={75}
             src="https://res.cloudinary.com/dtrl8p5mc/image/upload/v1748010203/robadb7wifuizlo5trvq.jpg"
             alt="An example of inpainting"
             className="px-6 shadow-2xl"
@@ -44,6 +28,5 @@ export default async function Dashboard() {
         </div>
       </div>
     </main>
-    // </PageAnimateFadeWrapper>
   );
 }

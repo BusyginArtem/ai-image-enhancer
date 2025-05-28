@@ -59,7 +59,7 @@ export default function Canvas({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    
+
     if (!canvas || !canvasCtxRef.current) return;
 
     const drawCursor = () => {
@@ -142,10 +142,12 @@ export default function Canvas({
     if (!drawingCanvasRef.current || disabled || !isDrawn) return;
     try {
       await onProcessImage(drawingCanvasRef.current);
-      setIsDrawn(false);
+
       clearCanvas();
     } catch (error) {
-      console.log("Something went wrong:", error);
+      console.error(error);
+    } finally {
+      setIsDrawn(false);
     }
   };
 
@@ -156,7 +158,12 @@ export default function Canvas({
         className="absolute inset-0 opacity-75"
         width={dimensions.width}
         height={dimensions.height}
-      />
+        role="img"
+        aria-label="Drawing layer for image editing"
+        tabIndex={0}
+      >
+        This is the drawing layer for image editing.
+      </canvas>
       <canvas
         ref={canvasRef}
         className="absolute inset-0 cursor-none"
@@ -166,7 +173,16 @@ export default function Canvas({
         onMouseLeave={sendDrawing}
         width={dimensions.width}
         height={dimensions.height}
-      />
+        role="img"
+        aria-label="Image editing canvas"
+        tabIndex={0}
+        aria-describedby="canvas-instructions"
+      >
+        This is the main image editing canvas.
+      </canvas>
+      <span id="canvas-instructions" className="sr-only">
+        Use your mouse to draw on the canvas. Keyboard drawing is not supported.
+      </span>
     </>
   );
 }
