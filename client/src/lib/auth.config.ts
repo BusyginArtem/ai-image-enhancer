@@ -1,4 +1,4 @@
-import 'server-only';
+import "server-only";
 
 import type { NextAuthConfig } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
@@ -9,7 +9,6 @@ import env from "@/env.server";
 export const accountFields = {
   credits: 20,
   usedCredits: 0,
-  subscription: "free",
 };
 
 export default {

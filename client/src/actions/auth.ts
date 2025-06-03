@@ -6,14 +6,27 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import { signIn, signOut } from "@/lib/auth";
 import { hashPassword, verifyPasswords } from "@/lib/auth-password";
-import { AuthFormState, RawAccount, RawUser } from "@/lib/definitions";
+import {
+  AuthFormState,
+  RawAccount,
+  RawUser,
+  SubscriptionIdentifier,
+} from "@/lib/definitions";
 import { signInFormSchema, signUpFormSchema } from "@/lib/validation";
-import DbAdapter from "@/services/db/adapter";
-import FirebaseAdminService from "@/services/db/firebase-admin";
+import DbAccountsAdapter from "@/services/db/accounts-db-adapter";
+import FirebaseAccountsService from "@/services/db/firebase-admin/accounts-db";
+import FirebaseSubscriptionsService from "@/services/db/firebase-admin/subscriptions-db";
+import FirebaseUserService from "@/services/db/firebase-admin/users-db";
+import DbSubscriptionsAdapter from "@/services/db/subscriptions-db-adapter";
+import DbUsersAdapter from "@/services/db/users-db-adapter";
 import { AuthProviders } from "@/services/types";
 import { accountFields } from "./../lib/auth.config";
 
-const db = new DbAdapter(FirebaseAdminService);
+const userDB = new DbUsersAdapter(FirebaseUserService);
+const accountsDB = new DbAccountsAdapter(FirebaseAccountsService);
+const subscriptionsDB = new DbSubscriptionsAdapter(
+  FirebaseSubscriptionsService,
+);
 
 export async function signInAction(_state: AuthFormState, formData: FormData) {
   const validatedFields = signInFormSchema.safeParse({
@@ -31,7 +44,7 @@ export async function signInAction(_state: AuthFormState, formData: FormData) {
   const { email, password } = validatedFields.data;
 
   try {
-    const user = await db.getUserByEmail({ email });
+    const user = await userDB.getByEmail({ email });
 
     if (!user) {
       return {
@@ -80,7 +93,7 @@ export async function signInAction(_state: AuthFormState, formData: FormData) {
 
     return {
       success: false,
-      message: "Something went wrong. Try again.",
+      message: "Something went wrong. Please contact support.",
     };
   }
 }
@@ -111,7 +124,7 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
   }
 
   try {
-    const user = await db.getUserByEmail({ email });
+    const user = await userDB.getByEmail({ email });
 
     if (user?.id) {
       return {
@@ -130,12 +143,23 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
       image: null,
     };
 
-    const userId = await db.createUser({ newUser: rawUser });
+    const userId = await userDB.create({ newUser: rawUser });
 
     if (!userId) {
       return {
         success: false,
-        message: "Something went wrong. Try again.",
+        message: "Something went wrong. Please contact support.",
+      };
+    }
+
+    const freeSubscriptionId = (await subscriptionsDB.findByName({
+      name: "FREE",
+    })) as SubscriptionIdentifier;
+
+    if (!freeSubscriptionId) {
+      return {
+        success: false,
+        message: "Something went wrong. Please contact support.",
       };
     }
 
@@ -144,10 +168,11 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
       provider: AuthProviders.CREDENTIALS,
       type: AuthProviders.CREDENTIALS,
       providerAccountId: userId,
+      subscriptionId: freeSubscriptionId,
       ...accountFields,
     };
 
-    await db.createAccount({ newAccount: rawAccount });
+    await accountsDB.create({ newAccount: rawAccount });
 
     return {
       success: true,
@@ -162,7 +187,7 @@ export async function signUpAction(_state: AuthFormState, formData: FormData) {
 
     return {
       success: false,
-      message: "Something went wrong. Try again.",
+      message: "Something went wrong. Please contact support.",
     };
   }
 }
